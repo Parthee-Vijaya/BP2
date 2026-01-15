@@ -149,9 +149,15 @@ export default function MyTimeEntries({ caregiverId = 1 }) {
                                 {/* Approved info */}
                                 {entry.status === 'approved' && (
                                     <div className="mt-3 text-xs text-green-600">
-                                        Godkendt af {entry.reviewed_by} • {formatDate(entry.reviewed_at)}
-                                        {entry.payroll_registered && (
-                                            <span className="ml-2">• Registreret i lønsystem</span>
+                                        Godkendt af {entry.reviewed_by}
+                                        {entry.payroll_date && (
+                                            <span className="ml-2">• Data sendt: {new Date(entry.payroll_date).toLocaleString('da-DK', {
+                                                day: '2-digit',
+                                                month: '2-digit',
+                                                year: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            })}</span>
                                         )}
                                     </div>
                                 )}

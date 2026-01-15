@@ -34,8 +34,8 @@ export default function RegisterTime({ caregiverId = 1 }) {
     const [formData, setFormData] = useState({
         child_id: preselectedChildId || '',
         date: new Date().toISOString().split('T')[0],
-        start_time: '08:00',
-        end_time: '16:00',
+        start_time: '',
+        end_time: '',
         comment: ''
     });
 
@@ -56,11 +56,6 @@ export default function RegisterTime({ caregiverId = 1 }) {
         try {
             const data = await caregiversApi.getById(caregiverId);
             setCaregiver(data);
-
-            // Vælg første barn hvis ingen er valgt
-            if (!formData.child_id && data.children?.length > 0) {
-                setFormData(prev => ({ ...prev, child_id: String(data.children[0].id) }));
-            }
         } catch (error) {
             console.error('Fejl:', error);
         } finally {

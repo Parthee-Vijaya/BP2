@@ -308,9 +308,7 @@ export default function ApprovalPage() {
                                     {activeTab === 'approved' && (
                                         <>
                                             <th className="px-4 py-3">Godkendt af</th>
-                                            <th className="px-4 py-3">Godkendt dato</th>
-                                            <th className="px-4 py-3">Lønsystem</th>
-                                            <th className="px-4 py-3">Sendt til løn</th>
+                                            <th className="px-4 py-3">Data sendt</th>
                                         </>
                                     )}
                                     {activeTab === 'rejected' && (
@@ -363,24 +361,22 @@ export default function ApprovalPage() {
                                             <>
                                                 <td className="px-4 py-3 text-sm text-gray-600">{entry.reviewed_by}</td>
                                                 <td className="px-4 py-3 text-sm text-gray-600">
-                                                    {entry.reviewed_at ? formatDate(entry.reviewed_at) : '-'}
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    {entry.payroll_registered ? (
-                                                        <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-100 rounded-full">
-                                                            <CheckMarkIcon />
-                                                        </span>
+                                                    {entry.payroll_date ? (
+                                                        new Date(entry.payroll_date).toLocaleString('da-DK', {
+                                                            day: '2-digit',
+                                                            month: '2-digit',
+                                                            year: 'numeric',
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })
                                                     ) : (
                                                         <button
                                                             onClick={() => handleMarkPayroll(entry.id)}
                                                             className="text-[#B54A32] hover:text-[#9a3f2b] text-sm font-medium"
                                                         >
-                                                            Marker
+                                                            Send data
                                                         </button>
                                                     )}
-                                                </td>
-                                                <td className="px-4 py-3 text-sm text-gray-600">
-                                                    {entry.payroll_date ? formatDate(entry.payroll_date) : '-'}
                                                 </td>
                                             </>
                                         )}
