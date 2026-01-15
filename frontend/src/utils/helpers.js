@@ -70,7 +70,10 @@ export function getGrantStatusColor(percentage) {
     return 'green';
 }
 
-// Formater timer (2 decimaler)
+// Formater timer i time:minut format (f.eks. 1:45)
 export function formatHours(hours) {
-    return (hours || 0).toFixed(2);
+    const h = hours || 0;
+    const wholeHours = Math.floor(h);
+    const minutes = Math.round((h - wholeHours) * 60);
+    return `${wholeHours}:${String(minutes).padStart(2, '0')}`;
 }
