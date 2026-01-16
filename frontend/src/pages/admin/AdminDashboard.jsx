@@ -29,7 +29,7 @@ const UsersIcon = () => (
 );
 
 const ArrowIcon = () => (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
     </svg>
 );
@@ -82,14 +82,15 @@ export default function AdminDashboard() {
     if (loading) {
         return (
             <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#B54A32]"></div>
+                <div className="animate-spin rounded-full h-10 w-10 border-2 border-white/30 border-t-[#B54A32]"></div>
             </div>
         );
     }
 
     return (
         <div className="space-y-8">
-            <div>
+            {/* Header */}
+            <div className="glass-card rounded-2xl p-6 animate-fade-in-up">
                 <h2 className="text-2xl font-bold text-gray-900">Oversigt</h2>
                 <p className="text-gray-500 mt-1">Overblik over timeregistreringer og stamdata</p>
             </div>
@@ -98,78 +99,94 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Link
                     to="/admin/godkendelse"
-                    className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md hover:border-[#B54A32]/30 transition-all group"
+                    className="glass-card rounded-2xl p-6 hover-lift group cursor-pointer"
+                    style={{ animationDelay: '0.1s' }}
                 >
                     <div className="flex items-center justify-between">
-                        <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600">
+                        <div className="w-14 h-14 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-amber-500/30">
                             <ClockIcon />
                         </div>
-                        <ArrowIcon />
+                        <div className="text-gray-400 group-hover:text-[#B54A32] transition-colors">
+                            <ArrowIcon />
+                        </div>
                     </div>
-                    <div className="mt-4">
-                        <div className="text-3xl font-bold text-gray-900">{stats.pendingCount}</div>
-                        <div className="text-sm text-gray-500 mt-1">Afventer godkendelse</div>
+                    <div className="mt-5">
+                        <div className="text-4xl font-bold text-gray-900">{stats.pendingCount}</div>
+                        <div className="text-sm text-gray-500 mt-1 font-medium">Afventer godkendelse</div>
                     </div>
                 </Link>
 
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                    <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600">
+                <div
+                    className="glass-card rounded-2xl p-6 animate-fade-in-up"
+                    style={{ animationDelay: '0.2s' }}
+                >
+                    <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
                         <CheckIcon />
                     </div>
-                    <div className="mt-4">
-                        <div className="text-3xl font-bold text-gray-900">{stats.approvedToday}</div>
-                        <div className="text-sm text-gray-500 mt-1">Godkendt i dag</div>
+                    <div className="mt-5">
+                        <div className="text-4xl font-bold text-gray-900">{stats.approvedToday}</div>
+                        <div className="text-sm text-gray-500 mt-1 font-medium">Godkendt i dag</div>
                     </div>
                 </div>
 
                 <Link
                     to="/admin/boern"
-                    className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md hover:border-[#B54A32]/30 transition-all group"
+                    className="glass-card rounded-2xl p-6 hover-lift group cursor-pointer animate-fade-in-up"
+                    style={{ animationDelay: '0.3s' }}
                 >
                     <div className="flex items-center justify-between">
-                        <div className="w-12 h-12 bg-[#B54A32]/10 rounded-lg flex items-center justify-center text-[#B54A32]">
+                        <div className="w-14 h-14 bg-gradient-to-br from-[#B54A32] to-[#9a3f2b] rounded-xl flex items-center justify-center text-white shadow-lg shadow-[#B54A32]/30">
                             <UserIcon />
                         </div>
-                        <ArrowIcon />
+                        <div className="text-gray-400 group-hover:text-[#B54A32] transition-colors">
+                            <ArrowIcon />
+                        </div>
                     </div>
-                    <div className="mt-4">
-                        <div className="text-3xl font-bold text-gray-900">{stats.childrenCount}</div>
-                        <div className="text-sm text-gray-500 mt-1">Børn</div>
+                    <div className="mt-5">
+                        <div className="text-4xl font-bold text-gray-900">{stats.childrenCount}</div>
+                        <div className="text-sm text-gray-500 mt-1 font-medium">Børn</div>
                     </div>
                 </Link>
 
                 <Link
                     to="/admin/barnepiger"
-                    className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md hover:border-[#B54A32]/30 transition-all group"
+                    className="glass-card rounded-2xl p-6 hover-lift group cursor-pointer animate-fade-in-up"
+                    style={{ animationDelay: '0.4s' }}
                 >
                     <div className="flex items-center justify-between">
-                        <div className="w-12 h-12 bg-[#B54A32]/10 rounded-lg flex items-center justify-center text-[#B54A32]">
+                        <div className="w-14 h-14 bg-gradient-to-br from-violet-400 to-violet-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-violet-500/30">
                             <UsersIcon />
                         </div>
-                        <ArrowIcon />
+                        <div className="text-gray-400 group-hover:text-[#B54A32] transition-colors">
+                            <ArrowIcon />
+                        </div>
                     </div>
-                    <div className="mt-4">
-                        <div className="text-3xl font-bold text-gray-900">{stats.caregiversCount}</div>
-                        <div className="text-sm text-gray-500 mt-1">Barnepiger</div>
+                    <div className="mt-5">
+                        <div className="text-4xl font-bold text-gray-900">{stats.caregiversCount}</div>
+                        <div className="text-sm text-gray-500 mt-1 font-medium">Barnepiger</div>
                     </div>
                 </Link>
             </div>
 
             {/* Recent pending */}
             {recentPending.length > 0 && (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-100">
-                        <h3 className="font-semibold text-gray-900">Seneste afventende registreringer</h3>
+                <div className="glass-card rounded-2xl overflow-hidden animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+                    <div className="px-6 py-5 border-b border-white/20">
+                        <h3 className="font-semibold text-gray-900 text-lg">Seneste afventende registreringer</h3>
                     </div>
-                    <div className="divide-y divide-gray-100">
-                        {recentPending.map((entry) => (
-                            <div key={entry.id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                    <div className="divide-y divide-white/10">
+                        {recentPending.map((entry, index) => (
+                            <div
+                                key={entry.id}
+                                className="px-6 py-4 flex items-center justify-between hover:bg-white/30 transition-all duration-200"
+                                style={{ animationDelay: `${0.6 + index * 0.1}s` }}
+                            >
                                 <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 text-sm font-medium">
+                                    <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center text-gray-600 text-sm font-bold shadow-inner">
                                         {entry.caregiver_first_name?.charAt(0)}{entry.caregiver_last_name?.charAt(0)}
                                     </div>
                                     <div>
-                                        <div className="font-medium text-gray-900">
+                                        <div className="font-semibold text-gray-900">
                                             {entry.caregiver_first_name} {entry.caregiver_last_name}
                                         </div>
                                         <div className="text-sm text-gray-500">
@@ -178,7 +195,7 @@ export default function AdminDashboard() {
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <div className="font-semibold text-gray-900">{formatHours(entry.total_hours)} timer</div>
+                                    <div className="font-bold text-gray-900 text-lg">{formatHours(entry.total_hours)} timer</div>
                                     <div className="text-sm text-gray-500">
                                         {formatDate(entry.date)} &middot; {entry.start_time}-{entry.end_time}
                                     </div>
@@ -186,10 +203,10 @@ export default function AdminDashboard() {
                             </div>
                         ))}
                     </div>
-                    <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
+                    <div className="px-6 py-4 border-t border-white/20 bg-white/20">
                         <Link
                             to="/admin/godkendelse"
-                            className="inline-flex items-center gap-2 text-[#B54A32] hover:text-[#9a3f2b] text-sm font-medium"
+                            className="inline-flex items-center gap-2 text-[#B54A32] hover:text-[#9a3f2b] text-sm font-semibold group transition-colors"
                         >
                             Se alle afventende
                             <ArrowIcon />
@@ -199,12 +216,12 @@ export default function AdminDashboard() {
             )}
 
             {recentPending.length === 0 && (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
-                    <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="glass-card rounded-2xl p-12 text-center animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+                    <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-emerald-500/30">
                         <CheckIcon />
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900">Ingen afventende registreringer</h3>
-                    <p className="text-gray-500 mt-1">Alle registreringer er blevet behandlet</p>
+                    <h3 className="text-xl font-semibold text-gray-900">Ingen afventende registreringer</h3>
+                    <p className="text-gray-500 mt-2">Alle registreringer er blevet behandlet</p>
                 </div>
             )}
         </div>

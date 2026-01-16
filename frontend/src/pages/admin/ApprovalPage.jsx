@@ -30,7 +30,7 @@ const DownloadIcon = () => (
 );
 
 const CheckMarkIcon = () => (
-    <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
     </svg>
 );
@@ -85,7 +85,6 @@ export default function ApprovalPage() {
         }
     }
 
-    // Filtrér entries baseret på søgning
     const filteredEntries = entries.filter(entry => {
         if (!searchQuery) return true;
         const query = searchQuery.toLowerCase();
@@ -166,38 +165,39 @@ export default function ApprovalPage() {
     ];
 
     return (
-        <div className="space-y-8">
-            <div className="flex items-center justify-between">
+        <div className="space-y-6">
+            {/* Header */}
+            <div className="glass-card rounded-2xl p-6 flex items-center justify-between animate-fade-in">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900">Godkendelse</h2>
                     <p className="text-gray-500 mt-1">Gennemgå og godkend timeregistreringer</p>
                 </div>
 
-                {/* Export button */}
                 <a
                     href={exportApi.timeEntries({ status: activeTab })}
                     download
-                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all text-sm font-medium shadow-lg shadow-emerald-500/25 hover-lift"
                 >
                     <DownloadIcon />
                     Eksporter CSV
                 </a>
             </div>
 
-            {/* Tabs */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="border-b border-gray-100 flex">
+            {/* Main Content Card */}
+            <div className="glass-card rounded-2xl overflow-hidden animate-fade-in-up">
+                {/* Tabs */}
+                <div className="border-b border-white/20 flex bg-white/30">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+                            className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-all ${
                                 activeTab === tab.id
-                                    ? 'border-[#B54A32] text-[#B54A32] bg-[#B54A32]/5'
-                                    : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                    ? 'bg-gradient-to-r from-[#B54A32] to-[#9a3f2b] text-white shadow-lg'
+                                    : 'text-gray-600 hover:text-gray-900 hover:bg-white/30'
                             }`}
                         >
-                            <span className={activeTab === tab.id ? 'text-[#B54A32]' : 'text-gray-400'}>
+                            <span className={activeTab === tab.id ? 'text-white' : 'text-gray-400'}>
                                 {tab.icon}
                             </span>
                             {tab.label}
@@ -206,8 +206,7 @@ export default function ApprovalPage() {
                 </div>
 
                 {/* Filters */}
-                <div className="p-4 bg-gray-50 border-b border-gray-100 flex flex-wrap items-center gap-4">
-                    {/* Søgefelt */}
+                <div className="p-4 bg-white/20 border-b border-white/20 flex flex-wrap items-center gap-4">
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                             <SearchIcon />
@@ -217,16 +216,16 @@ export default function ApprovalPage() {
                             placeholder="Søg barnepige (navn/MA-nr.)..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-9 pr-3 py-1.5 border border-gray-200 rounded-lg text-sm w-64 focus:ring-2 focus:ring-[#B54A32] focus:border-[#B54A32]"
+                            className="pl-9 pr-3 py-2 glass-input rounded-xl text-sm w-64 focus:ring-2 focus:ring-[#B54A32] focus:border-[#B54A32]"
                         />
                     </div>
 
                     <label className="text-sm text-gray-600 flex items-center gap-2">
-                        <span>Barn:</span>
+                        <span className="font-medium">Barn:</span>
                         <select
                             value={selectedChild}
                             onChange={(e) => setSelectedChild(e.target.value)}
-                            className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-[#B54A32] focus:border-[#B54A32]"
+                            className="glass-input rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#B54A32] focus:border-[#B54A32]"
                         >
                             <option value="all">Alle børn</option>
                             {children.map((child) => (
@@ -238,11 +237,11 @@ export default function ApprovalPage() {
                     </label>
 
                     <label className="text-sm text-gray-600 flex items-center gap-2">
-                        <span>Barnepige:</span>
+                        <span className="font-medium">Barnepige:</span>
                         <select
                             value={selectedCaregiver}
                             onChange={(e) => setSelectedCaregiver(e.target.value)}
-                            className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-[#B54A32] focus:border-[#B54A32]"
+                            className="glass-input rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#B54A32] focus:border-[#B54A32]"
                         >
                             <option value="all">Alle barnepiger</option>
                             {caregivers.map((cg) => (
@@ -257,7 +256,7 @@ export default function ApprovalPage() {
                         <button
                             onClick={handleBatchApprove}
                             disabled={selectedIds.length === 0}
-                            className="ml-auto inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-colors"
+                            className="ml-auto inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-all shadow-lg shadow-emerald-500/25"
                         >
                             <CheckMarkIcon />
                             Godkend valgte ({selectedIds.length})
@@ -268,78 +267,80 @@ export default function ApprovalPage() {
                 {/* Table */}
                 {loading ? (
                     <div className="p-12 text-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#B54A32] mx-auto"></div>
-                        <p className="text-gray-500 mt-3">Indlæser...</p>
+                        <div className="animate-spin rounded-full h-10 w-10 border-2 border-white/30 border-t-[#B54A32] mx-auto"></div>
+                        <p className="text-gray-500 mt-4">Indlæser...</p>
                     </div>
                 ) : filteredEntries.length === 0 ? (
                     <div className="p-12 text-center">
-                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                        <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-emerald-500/30 text-white">
                             <CheckIcon />
                         </div>
-                        <p className="text-gray-500">
+                        <p className="text-gray-600 font-medium">
                             {searchQuery ? 'Ingen resultater for søgningen' : 'Ingen registreringer i denne kategori'}
                         </p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full">
-                            <thead className="bg-gray-50 text-left text-sm text-gray-600">
+                            <thead className="bg-white/30 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 <tr>
                                     {activeTab === 'pending' && (
-                                        <th className="px-4 py-3">
+                                        <th className="px-4 py-4">
                                             <input
                                                 type="checkbox"
                                                 checked={selectedIds.length === filteredEntries.length && filteredEntries.length > 0}
                                                 onChange={toggleSelectAll}
+                                                className="rounded border-gray-300 text-[#B54A32] focus:ring-[#B54A32]"
                                             />
                                         </th>
                                     )}
-                                    <th className="px-4 py-3">Barnepige</th>
-                                    <th className="px-4 py-3">MA-nr.</th>
-                                    <th className="px-4 py-3">Barn</th>
-                                    <th className="px-4 py-3">Dato</th>
-                                    <th className="px-4 py-3">Tid</th>
-                                    <th className="px-4 py-3">Normal</th>
-                                    <th className="px-4 py-3">Aften</th>
-                                    <th className="px-4 py-3">Nat</th>
-                                    <th className="px-4 py-3">Lør</th>
-                                    <th className="px-4 py-3">Søn/Hel</th>
-                                    <th className="px-4 py-3">Total</th>
+                                    <th className="px-4 py-4">Barnepige</th>
+                                    <th className="px-4 py-4">MA-nr.</th>
+                                    <th className="px-4 py-4">Barn</th>
+                                    <th className="px-4 py-4">Dato</th>
+                                    <th className="px-4 py-4">Tid</th>
+                                    <th className="px-4 py-4">Normal</th>
+                                    <th className="px-4 py-4">Aften</th>
+                                    <th className="px-4 py-4">Nat</th>
+                                    <th className="px-4 py-4">Lør</th>
+                                    <th className="px-4 py-4">Søn/Hel</th>
+                                    <th className="px-4 py-4">Total</th>
                                     {activeTab === 'approved' && (
                                         <>
-                                            <th className="px-4 py-3">Godkendt af</th>
-                                            <th className="px-4 py-3">Data sendt</th>
+                                            <th className="px-4 py-4">Godkendt af</th>
+                                            <th className="px-4 py-4">Data sendt</th>
                                         </>
                                     )}
                                     {activeTab === 'rejected' && (
                                         <>
-                                            <th className="px-4 py-3">Afvist af</th>
-                                            <th className="px-4 py-3">Afvist dato</th>
-                                            <th className="px-4 py-3">Årsag</th>
+                                            <th className="px-4 py-4">Afvist af</th>
+                                            <th className="px-4 py-4">Afvist dato</th>
+                                            <th className="px-4 py-4">Årsag</th>
                                         </>
                                     )}
-                                    {activeTab === 'pending' && <th className="px-4 py-3">Handlinger</th>}
+                                    {activeTab === 'pending' && <th className="px-4 py-4">Handlinger</th>}
                                 </tr>
                             </thead>
-                            <tbody className="divide-y">
+                            <tbody className="divide-y divide-white/10">
                                 {filteredEntries.map((entry) => (
-                                    <tr key={entry.id} className="hover:bg-gray-50">
+                                    <tr key={entry.id} className="hover:bg-white/20 transition-colors">
                                         {activeTab === 'pending' && (
-                                            <td className="px-4 py-3">
+                                            <td className="px-4 py-4">
                                                 <input
                                                     type="checkbox"
                                                     checked={selectedIds.includes(entry.id)}
                                                     onChange={() => toggleSelect(entry.id)}
+                                                    className="rounded border-gray-300 text-[#B54A32] focus:ring-[#B54A32]"
                                                 />
                                             </td>
                                         )}
-                                        <td className="px-4 py-3 font-medium">
+                                        <td className="px-4 py-4 font-semibold text-gray-900">
                                             {entry.caregiver_first_name} {entry.caregiver_last_name}
                                         </td>
-                                        <td className="px-4 py-3 text-gray-600">{entry.ma_number}</td>
-                                        <td className="px-4 py-3">
+                                        <td className="px-4 py-4 text-gray-600">{entry.ma_number}</td>
+                                        <td className="px-4 py-4">
                                             <div>
-                                                {entry.child_first_name} {entry.child_last_name}
+                                                <span className="font-medium">{entry.child_first_name} {entry.child_last_name}</span>
                                                 {entry.child_birth_date && (
                                                     <div className="text-xs text-gray-400">
                                                         f. {formatDate(entry.child_birth_date)}
@@ -347,32 +348,34 @@ export default function ApprovalPage() {
                                                 )}
                                             </div>
                                         </td>
-                                        <td className="px-4 py-3">{formatDate(entry.date)}</td>
-                                        <td className="px-4 py-3 text-sm">
+                                        <td className="px-4 py-4">{formatDate(entry.date)}</td>
+                                        <td className="px-4 py-4 text-sm font-medium">
                                             {entry.start_time} - {entry.end_time}
                                         </td>
-                                        <td className="px-4 py-3">{formatHours(entry.normal_hours)}</td>
-                                        <td className="px-4 py-3">{formatHours(entry.evening_hours)}</td>
-                                        <td className="px-4 py-3">{formatHours(entry.night_hours)}</td>
-                                        <td className="px-4 py-3">{formatHours(entry.saturday_hours)}</td>
-                                        <td className="px-4 py-3">{formatHours(entry.sunday_holiday_hours)}</td>
-                                        <td className="px-4 py-3 font-bold">{formatHours(entry.total_hours)}</td>
+                                        <td className="px-4 py-4">{formatHours(entry.normal_hours)}</td>
+                                        <td className="px-4 py-4">{formatHours(entry.evening_hours)}</td>
+                                        <td className="px-4 py-4">{formatHours(entry.night_hours)}</td>
+                                        <td className="px-4 py-4">{formatHours(entry.saturday_hours)}</td>
+                                        <td className="px-4 py-4">{formatHours(entry.sunday_holiday_hours)}</td>
+                                        <td className="px-4 py-4 font-bold text-[#B54A32]">{formatHours(entry.total_hours)}</td>
                                         {activeTab === 'approved' && (
                                             <>
-                                                <td className="px-4 py-3 text-sm text-gray-600">{entry.reviewed_by}</td>
-                                                <td className="px-4 py-3 text-sm text-gray-600">
+                                                <td className="px-4 py-4 text-sm text-gray-600">{entry.reviewed_by}</td>
+                                                <td className="px-4 py-4 text-sm text-gray-600">
                                                     {entry.payroll_date ? (
-                                                        new Date(entry.payroll_date).toLocaleString('da-DK', {
-                                                            day: '2-digit',
-                                                            month: '2-digit',
-                                                            year: 'numeric',
-                                                            hour: '2-digit',
-                                                            minute: '2-digit'
-                                                        })
+                                                        <span className="text-emerald-600 font-medium">
+                                                            {new Date(entry.payroll_date).toLocaleString('da-DK', {
+                                                                day: '2-digit',
+                                                                month: '2-digit',
+                                                                year: 'numeric',
+                                                                hour: '2-digit',
+                                                                minute: '2-digit'
+                                                            })}
+                                                        </span>
                                                     ) : (
                                                         <button
                                                             onClick={() => handleMarkPayroll(entry.id)}
-                                                            className="text-[#B54A32] hover:text-[#9a3f2b] text-sm font-medium"
+                                                            className="text-[#B54A32] hover:text-[#9a3f2b] text-sm font-semibold hover:underline"
                                                         >
                                                             Send data
                                                         </button>
@@ -382,27 +385,27 @@ export default function ApprovalPage() {
                                         )}
                                         {activeTab === 'rejected' && (
                                             <>
-                                                <td className="px-4 py-3 text-sm">{entry.reviewed_by}</td>
-                                                <td className="px-4 py-3 text-sm text-gray-600">
+                                                <td className="px-4 py-4 text-sm">{entry.reviewed_by}</td>
+                                                <td className="px-4 py-4 text-sm text-gray-600">
                                                     {entry.reviewed_at ? formatDate(entry.reviewed_at) : '-'}
                                                 </td>
-                                                <td className="px-4 py-3 text-sm text-red-600">
+                                                <td className="px-4 py-4 text-sm text-rose-600 font-medium">
                                                     {entry.rejection_reason}
                                                 </td>
                                             </>
                                         )}
                                         {activeTab === 'pending' && (
-                                            <td className="px-4 py-3">
+                                            <td className="px-4 py-4">
                                                 <div className="flex gap-2">
                                                     <button
                                                         onClick={() => handleApprove(entry.id)}
-                                                        className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors"
+                                                        className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl text-sm font-medium hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-md"
                                                     >
                                                         Godkend
                                                     </button>
                                                     <button
                                                         onClick={() => setRejectModal({ open: true, entryId: entry.id })}
-                                                        className="px-3 py-1.5 bg-rose-600 text-white rounded-lg text-sm font-medium hover:bg-rose-700 transition-colors"
+                                                        className="px-4 py-2 bg-gradient-to-r from-rose-500 to-rose-600 text-white rounded-xl text-sm font-medium hover:from-rose-600 hover:to-rose-700 transition-all shadow-md"
                                                     >
                                                         Afvis
                                                     </button>
@@ -419,24 +422,24 @@ export default function ApprovalPage() {
 
             {/* Reject Modal */}
             {rejectModal.open && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 bg-rose-100 rounded-full flex items-center justify-center text-rose-600">
+                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+                    <div className="glass-card-strong rounded-2xl shadow-2xl p-6 w-full max-w-md animate-scale-in">
+                        <div className="flex items-center gap-3 mb-5">
+                            <div className="w-12 h-12 bg-gradient-to-br from-rose-400 to-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-rose-500/30">
                                 <XIcon />
                             </div>
-                            <h3 className="text-lg font-bold text-gray-900">Afvis registrering</h3>
+                            <h3 className="text-xl font-bold text-gray-900">Afvis registrering</h3>
                         </div>
                         <textarea
                             value={rejectReason}
                             onChange={(e) => setRejectReason(e.target.value)}
                             placeholder="Angiv årsag til afvisning..."
-                            className="w-full border border-gray-200 rounded-lg p-3 h-32 focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
+                            className="w-full glass-input rounded-xl p-4 h-32 focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                         />
-                        <div className="flex gap-3 mt-4">
+                        <div className="flex gap-3 mt-5">
                             <button
                                 onClick={handleReject}
-                                className="flex-1 px-4 py-2.5 bg-rose-600 text-white rounded-lg hover:bg-rose-700 font-medium transition-colors"
+                                className="flex-1 px-5 py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white rounded-xl hover:from-rose-600 hover:to-rose-700 font-medium transition-all shadow-lg shadow-rose-500/25"
                             >
                                 Afvis
                             </button>
@@ -445,7 +448,7 @@ export default function ApprovalPage() {
                                     setRejectModal({ open: false, entryId: null });
                                     setRejectReason('');
                                 }}
-                                className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium transition-colors"
+                                className="flex-1 px-5 py-3 bg-white/50 text-gray-700 rounded-xl hover:bg-white/70 font-medium transition-all border border-white/30"
                             >
                                 Annuller
                             </button>

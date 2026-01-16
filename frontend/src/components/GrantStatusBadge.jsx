@@ -12,34 +12,51 @@ export default function GrantStatusBadge({ used, total, showBar = true }) {
     const color = getGrantStatusColor(percentage);
 
     const colorClasses = {
-        green: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-        yellow: 'bg-amber-50 text-amber-700 border-amber-200',
-        red: 'bg-rose-50 text-rose-700 border-rose-200'
+        green: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20',
+        yellow: 'bg-amber-500/10 text-amber-700 border-amber-500/20',
+        red: 'bg-rose-500/10 text-rose-700 border-rose-500/20'
     };
 
     const barColorClasses = {
-        green: 'bg-emerald-500',
-        yellow: 'bg-amber-500',
-        red: 'bg-rose-500'
+        green: 'from-emerald-400 to-emerald-600',
+        yellow: 'from-amber-400 to-amber-600',
+        red: 'from-rose-400 to-rose-600'
+    };
+
+    const glowClasses = {
+        green: 'shadow-emerald-500/20',
+        yellow: 'shadow-amber-500/20',
+        red: 'shadow-rose-500/20'
     };
 
     return (
-        <div className="space-y-1.5">
-            <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium ${colorClasses[color]}`}>
-                <span className="font-semibold">{formatHours(used)}</span>
+        <div className="space-y-2">
+            <div className={`
+                inline-flex items-center gap-2 px-3 py-1.5
+                rounded-full border text-xs font-medium
+                backdrop-blur-sm shadow-lg
+                transition-all duration-300
+                ${colorClasses[color]}
+                ${glowClasses[color]}
+            `}>
+                <span className="font-bold">{formatHours(used)}</span>
                 <span className="text-gray-400">/</span>
                 <span>{formatHours(total)} timer</span>
                 {percentage >= 100 && (
-                    <span className="ml-1 text-rose-600">
+                    <span className="ml-1 text-rose-600 animate-pulse">
                         <WarningIcon />
                     </span>
                 )}
             </div>
 
             {showBar && (
-                <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                <div className="w-full bg-white/30 backdrop-blur-sm rounded-full h-2 overflow-hidden shadow-inner border border-white/20">
                     <div
-                        className={`h-1.5 rounded-full transition-all duration-300 ${barColorClasses[color]}`}
+                        className={`
+                            h-2 rounded-full transition-all duration-500 ease-out
+                            bg-gradient-to-r ${barColorClasses[color]}
+                            shadow-lg
+                        `}
                         style={{ width: `${Math.min(100, percentage)}%` }}
                     />
                 </div>
