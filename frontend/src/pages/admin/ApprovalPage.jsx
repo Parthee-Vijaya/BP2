@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { timeEntriesApi, childrenApi, caregiversApi, exportApi } from '../../utils/api';
 import StatusBadge from '../../components/StatusBadge';
-import GrantStatusBadge from '../../components/GrantStatusBadge';
-import { formatDate, formatHours } from '../../utils/helpers';
+import { formatHours } from '../../utils/helpers';
 
 // Icons
 const ClockIcon = () => (
@@ -40,6 +39,20 @@ const SearchIcon = () => (
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
     </svg>
 );
+
+// Kort datoformat (dd/mm)
+function formatShortDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('da-DK', { day: '2-digit', month: '2-digit' });
+}
+
+// Fuldt datoformat (dd/mm/åå)
+function formatMediumDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('da-DK', { day: '2-digit', month: '2-digit', year: '2-digit' });
+}
 
 export default function ApprovalPage() {
     const [activeTab, setActiveTab] = useState('pending');
@@ -177,7 +190,7 @@ export default function ApprovalPage() {
     }
 
     const tabs = [
-        { id: 'pending', label: 'Afventer godkendelse', icon: <ClockIcon /> },
+        { id: 'pending', label: 'Afventer', icon: <ClockIcon /> },
         { id: 'approved', label: 'Godkendte', icon: <CheckIcon /> },
         { id: 'rejected', label: 'Afviste', icon: <XIcon /> }
     ];
@@ -201,21 +214,21 @@ export default function ApprovalPage() {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             {/* Header */}
-            <div className="glass-card rounded-2xl p-6 flex items-center justify-between animate-fade-in">
+            <div className="glass-card rounded-2xl p-4 flex items-center justify-between animate-fade-in">
                 <div>
-                    <h2 className="text-2xl font-bold text-gray-900">Godkendelse</h2>
-                    <p className="text-gray-500 mt-1">Gennemgå og godkend timeregistreringer</p>
+                    <h2 className="text-xl font-bold text-gray-900">Godkendelse</h2>
+                    <p className="text-gray-500 text-sm">Gennemgå og godkend timeregistreringer</p>
                 </div>
 
                 <a
                     href={exportApi.timeEntries({ status: activeTab })}
                     download
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all text-sm font-medium shadow-lg shadow-emerald-500/25 hover-lift"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all text-sm font-medium shadow-lg shadow-emerald-500/25"
                 >
                     <DownloadIcon />
-                    Eksporter CSV
+                    CSV
                 </a>
             </div>
 
@@ -227,7 +240,7 @@ export default function ApprovalPage() {
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-all ${
+                            className={`flex items-center gap-1.5 px-4 py-3 text-sm font-medium transition-all ${
                                 activeTab === tab.id
                                     ? 'bg-gradient-to-r from-[#B54A32] to-[#9a3f2b] text-white shadow-lg'
                                     : 'text-gray-600 hover:text-gray-900 hover:bg-white/30'
@@ -242,60 +255,54 @@ export default function ApprovalPage() {
                 </div>
 
                 {/* Filters */}
-                <div className="p-4 bg-white/20 border-b border-white/20 flex flex-wrap items-center gap-4">
+                <div className="p-3 bg-white/20 border-b border-white/20 flex flex-wrap items-center gap-3">
                     <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-gray-400">
                             <SearchIcon />
                         </div>
                         <input
                             type="text"
-                            placeholder="Søg barnepige (navn/MA-nr.)..."
+                            placeholder="Søg..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-9 pr-3 py-2 glass-input rounded-xl text-sm w-64 focus:ring-2 focus:ring-[#B54A32] focus:border-[#B54A32]"
+                            className="pl-8 pr-3 py-1.5 glass-input rounded-lg text-sm w-40"
                         />
                     </div>
 
-                    <label className="text-sm text-gray-600 flex items-center gap-2">
-                        <span className="font-medium">Barn:</span>
-                        <select
-                            value={selectedChild}
-                            onChange={(e) => setSelectedChild(e.target.value)}
-                            className="glass-input rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#B54A32] focus:border-[#B54A32]"
-                        >
-                            <option value="all">Alle børn</option>
-                            {children.map((child) => (
-                                <option key={child.id} value={child.id}>
-                                    {child.first_name} {child.last_name} {child.birth_date ? `(${formatDate(child.birth_date)})` : ''}
-                                </option>
-                            ))}
-                        </select>
-                    </label>
+                    <select
+                        value={selectedChild}
+                        onChange={(e) => setSelectedChild(e.target.value)}
+                        className="glass-input rounded-lg px-2 py-1.5 text-sm"
+                    >
+                        <option value="all">Alle børn</option>
+                        {children.map((child) => (
+                            <option key={child.id} value={child.id}>
+                                {child.first_name} {child.last_name}
+                            </option>
+                        ))}
+                    </select>
 
-                    <label className="text-sm text-gray-600 flex items-center gap-2">
-                        <span className="font-medium">Barnepige:</span>
-                        <select
-                            value={selectedCaregiver}
-                            onChange={(e) => setSelectedCaregiver(e.target.value)}
-                            className="glass-input rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#B54A32] focus:border-[#B54A32]"
-                        >
-                            <option value="all">Alle barnepiger</option>
-                            {caregivers.map((cg) => (
-                                <option key={cg.id} value={cg.id}>
-                                    {cg.first_name} {cg.last_name} ({cg.ma_number})
-                                </option>
-                            ))}
-                        </select>
-                    </label>
+                    <select
+                        value={selectedCaregiver}
+                        onChange={(e) => setSelectedCaregiver(e.target.value)}
+                        className="glass-input rounded-lg px-2 py-1.5 text-sm"
+                    >
+                        <option value="all">Alle barnepiger</option>
+                        {caregivers.map((cg) => (
+                            <option key={cg.id} value={cg.id}>
+                                {cg.first_name} {cg.last_name}
+                            </option>
+                        ))}
+                    </select>
 
                     {activeTab === 'pending' && filteredEntries.length > 0 && (
                         <button
                             onClick={handleBatchApprove}
                             disabled={selectedIds.length === 0}
-                            className="ml-auto inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-all shadow-lg shadow-emerald-500/25"
+                            className="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:from-emerald-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-all"
                         >
                             <CheckMarkIcon />
-                            Godkend valgte ({selectedIds.length})
+                            Godkend ({selectedIds.length})
                         </button>
                     )}
                 </div>
@@ -308,20 +315,20 @@ export default function ApprovalPage() {
                     </div>
                 ) : filteredEntries.length === 0 ? (
                     <div className="p-12 text-center">
-                        <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-emerald-500/30 text-white">
+                        <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/30 text-white">
                             <CheckIcon />
                         </div>
                         <p className="text-gray-600 font-medium">
-                            {searchQuery ? 'Ingen resultater for søgningen' : 'Ingen registreringer i denne kategori'}
+                            {searchQuery ? 'Ingen resultater' : 'Ingen registreringer'}
                         </p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
-                        <table className="w-full">
+                        <table className="w-full text-sm">
                             <thead className="bg-white/30 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 <tr>
                                     {activeTab === 'pending' && (
-                                        <th className="px-4 py-4">
+                                        <th className="px-2 py-3 w-8">
                                             <input
                                                 type="checkbox"
                                                 checked={selectedIds.length === filteredEntries.length && filteredEntries.length > 0}
@@ -330,145 +337,129 @@ export default function ApprovalPage() {
                                             />
                                         </th>
                                     )}
-                                    <th className="px-4 py-4">Barnepige</th>
-                                    <th className="px-4 py-4">MA-nr.</th>
-                                    <th className="px-4 py-4">Barn</th>
-                                    <th className="px-4 py-4">Bevilling</th>
-                                    <th className="px-4 py-4">Dato</th>
-                                    <th className="px-4 py-4">Tid</th>
-                                    <th className="px-4 py-4">Normal</th>
-                                    <th className="px-4 py-4">Aften</th>
-                                    <th className="px-4 py-4">Nat</th>
-                                    <th className="px-4 py-4">Lør</th>
-                                    <th className="px-4 py-4">Søn/Hel</th>
-                                    <th className="px-4 py-4">Total</th>
+                                    <th className="px-2 py-3">Barnepige</th>
+                                    <th className="px-2 py-3">Barn</th>
+                                    <th className="px-2 py-3 text-center">Bevilling</th>
+                                    <th className="px-2 py-3">Dato</th>
+                                    <th className="px-2 py-3">Tid</th>
+                                    <th className="px-2 py-3 text-center">Timer</th>
                                     {activeTab === 'approved' && (
                                         <>
-                                            <th className="px-4 py-4">Godkendt af</th>
-                                            <th className="px-4 py-4">Data sendt</th>
+                                            <th className="px-2 py-3">Godkendt</th>
+                                            <th className="px-2 py-3">Data sendt</th>
                                         </>
                                     )}
                                     {activeTab === 'rejected' && (
                                         <>
-                                            <th className="px-4 py-4">Afvist af</th>
-                                            <th className="px-4 py-4">Afvist dato</th>
-                                            <th className="px-4 py-4">Årsag</th>
+                                            <th className="px-2 py-3">Afvist</th>
+                                            <th className="px-2 py-3">Årsag</th>
                                         </>
                                     )}
-                                    {activeTab === 'pending' && <th className="px-4 py-4">Handlinger</th>}
+                                    {activeTab === 'pending' && <th className="px-2 py-3 text-right">Handling</th>}
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/10">
-                                {filteredEntries.map((entry) => (
-                                    <tr key={entry.id} className="hover:bg-white/20 transition-colors">
-                                        {activeTab === 'pending' && (
-                                            <td className="px-4 py-4">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectedIds.includes(entry.id)}
-                                                    onChange={() => toggleSelect(entry.id)}
-                                                    className="rounded border-gray-300 text-[#B54A32] focus:ring-[#B54A32]"
-                                                />
+                                {filteredEntries.map((entry) => {
+                                    const grantStatus = getGrantStatus(entry.child_id);
+                                    return (
+                                        <tr key={entry.id} className="hover:bg-white/20 transition-colors">
+                                            {activeTab === 'pending' && (
+                                                <td className="px-2 py-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedIds.includes(entry.id)}
+                                                        onChange={() => toggleSelect(entry.id)}
+                                                        className="rounded border-gray-300 text-[#B54A32] focus:ring-[#B54A32]"
+                                                    />
+                                                </td>
+                                            )}
+                                            <td className="px-2 py-2">
+                                                <div className="font-medium text-gray-900">{entry.caregiver_first_name} {entry.caregiver_last_name}</div>
+                                                <div className="text-xs text-gray-400">{entry.ma_number}</div>
                                             </td>
-                                        )}
-                                        <td className="px-4 py-4 font-semibold text-gray-900">
-                                            {entry.caregiver_first_name} {entry.caregiver_last_name}
-                                        </td>
-                                        <td className="px-4 py-4 text-gray-600">{entry.ma_number}</td>
-                                        <td className="px-4 py-4">
-                                            <div>
-                                                <span className="font-medium">{entry.child_first_name} {entry.child_last_name}</span>
-                                                {entry.child_birth_date && (
-                                                    <div className="text-xs text-gray-400">
-                                                        f. {formatDate(entry.child_birth_date)}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </td>
-                                        <td className="px-4 py-4">
-                                            {(() => {
-                                                const status = getGrantStatus(entry.child_id);
-                                                if (!status) return <span className="text-gray-400">-</span>;
-
-                                                return (
-                                                    <span className={`text-sm ${
-                                                        status.isExceeded
-                                                            ? 'text-rose-600 font-bold'
-                                                            : status.isWarning
-                                                            ? 'font-bold text-gray-900'
+                                            <td className="px-2 py-2">
+                                                <div className="font-medium">{entry.child_first_name} {entry.child_last_name}</div>
+                                            </td>
+                                            <td className="px-2 py-2 text-center">
+                                                {grantStatus ? (
+                                                    <div className={`leading-tight ${
+                                                        grantStatus.isExceeded
+                                                            ? 'text-rose-600'
+                                                            : grantStatus.isWarning
+                                                            ? 'text-gray-900'
                                                             : 'text-gray-600'
                                                     }`}>
-                                                        {formatHours(status.usedHours)}/{formatHours(status.grantHours)}
-                                                    </span>
-                                                );
-                                            })()}
-                                        </td>
-                                        <td className="px-4 py-4">{formatDate(entry.date)}</td>
-                                        <td className="px-4 py-4 text-sm font-medium">
-                                            {entry.start_time} - {entry.end_time}
-                                        </td>
-                                        <td className="px-4 py-4">{formatHours(entry.normal_hours)}</td>
-                                        <td className="px-4 py-4">{formatHours(entry.evening_hours)}</td>
-                                        <td className="px-4 py-4">{formatHours(entry.night_hours)}</td>
-                                        <td className="px-4 py-4">{formatHours(entry.saturday_hours)}</td>
-                                        <td className="px-4 py-4">{formatHours(entry.sunday_holiday_hours)}</td>
-                                        <td className="px-4 py-4 font-bold text-[#B54A32]">{formatHours(entry.total_hours)}</td>
-                                        {activeTab === 'approved' && (
-                                            <>
-                                                <td className="px-4 py-4 text-sm text-gray-600">{entry.reviewed_by}</td>
-                                                <td className="px-4 py-4 text-sm text-gray-600">
-                                                    {entry.payroll_date ? (
-                                                        <span className="text-emerald-600 font-medium">
-                                                            {new Date(entry.payroll_date).toLocaleString('da-DK', {
-                                                                day: '2-digit',
-                                                                month: '2-digit',
-                                                                year: 'numeric',
-                                                                hour: '2-digit',
-                                                                minute: '2-digit'
-                                                            })}
-                                                        </span>
-                                                    ) : (
-                                                        <button
-                                                            onClick={() => handleMarkPayroll(entry.id)}
-                                                            className="text-[#B54A32] hover:text-[#9a3f2b] text-sm font-semibold hover:underline"
-                                                        >
-                                                            Send data
-                                                        </button>
-                                                    )}
-                                                </td>
-                                            </>
-                                        )}
-                                        {activeTab === 'rejected' && (
-                                            <>
-                                                <td className="px-4 py-4 text-sm">{entry.reviewed_by}</td>
-                                                <td className="px-4 py-4 text-sm text-gray-600">
-                                                    {entry.reviewed_at ? formatDate(entry.reviewed_at) : '-'}
-                                                </td>
-                                                <td className="px-4 py-4 text-sm text-rose-600 font-medium">
-                                                    {entry.rejection_reason}
-                                                </td>
-                                            </>
-                                        )}
-                                        {activeTab === 'pending' && (
-                                            <td className="px-4 py-4">
-                                                <div className="flex gap-2">
-                                                    <button
-                                                        onClick={() => handleApprove(entry.id)}
-                                                        className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl text-sm font-medium hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-md"
-                                                    >
-                                                        Godkend
-                                                    </button>
-                                                    <button
-                                                        onClick={() => setRejectModal({ open: true, entryId: entry.id })}
-                                                        className="px-4 py-2 bg-gradient-to-r from-rose-500 to-rose-600 text-white rounded-xl text-sm font-medium hover:from-rose-600 hover:to-rose-700 transition-all shadow-md"
-                                                    >
-                                                        Afvis
-                                                    </button>
-                                                </div>
+                                                        <div className={grantStatus.isExceeded || grantStatus.isWarning ? 'font-bold' : ''}>
+                                                            {formatHours(grantStatus.usedHours)}
+                                                        </div>
+                                                        <div className="text-xs text-gray-400">
+                                                            / {formatHours(grantStatus.grantHours)}
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-gray-400">-</span>
+                                                )}
                                             </td>
-                                        )}
-                                    </tr>
-                                ))}
+                                            <td className="px-2 py-2">
+                                                <div className="font-medium">{formatShortDate(entry.date)}</div>
+                                            </td>
+                                            <td className="px-2 py-2 text-gray-600 whitespace-nowrap">
+                                                {entry.start_time?.slice(0,5)}-{entry.end_time?.slice(0,5)}
+                                            </td>
+                                            <td className="px-2 py-2 text-center">
+                                                <span className="font-bold text-[#B54A32]">{formatHours(entry.total_hours)}</span>
+                                            </td>
+                                            {activeTab === 'approved' && (
+                                                <>
+                                                    <td className="px-2 py-2 text-gray-600">{entry.reviewed_by}</td>
+                                                    <td className="px-2 py-2">
+                                                        {entry.payroll_date ? (
+                                                            <span className="text-emerald-600 text-xs">
+                                                                {formatMediumDate(entry.payroll_date)}
+                                                            </span>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() => handleMarkPayroll(entry.id)}
+                                                                className="text-[#B54A32] hover:text-[#9a3f2b] text-xs font-medium hover:underline"
+                                                            >
+                                                                Send
+                                                            </button>
+                                                        )}
+                                                    </td>
+                                                </>
+                                            )}
+                                            {activeTab === 'rejected' && (
+                                                <>
+                                                    <td className="px-2 py-2">
+                                                        <div className="text-gray-600">{entry.reviewed_by}</div>
+                                                        <div className="text-xs text-gray-400">{formatShortDate(entry.reviewed_at)}</div>
+                                                    </td>
+                                                    <td className="px-2 py-2 text-rose-600 text-xs max-w-32 truncate" title={entry.rejection_reason}>
+                                                        {entry.rejection_reason}
+                                                    </td>
+                                                </>
+                                            )}
+                                            {activeTab === 'pending' && (
+                                                <td className="px-2 py-2 text-right">
+                                                    <div className="flex gap-1 justify-end">
+                                                        <button
+                                                            onClick={() => handleApprove(entry.id)}
+                                                            className="px-2.5 py-1 bg-emerald-500 text-white rounded-lg text-xs font-medium hover:bg-emerald-600 transition-all"
+                                                        >
+                                                            Godkend
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setRejectModal({ open: true, entryId: entry.id })}
+                                                            className="px-2.5 py-1 bg-rose-500 text-white rounded-lg text-xs font-medium hover:bg-rose-600 transition-all"
+                                                        >
+                                                            Afvis
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            )}
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>
