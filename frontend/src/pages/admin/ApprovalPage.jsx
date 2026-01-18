@@ -40,11 +40,11 @@ const SearchIcon = () => (
     </svg>
 );
 
-// Kort datoformat (dd/mm)
+// Kort datoformat (dd/mm/åå)
 function formatShortDate(dateString) {
     if (!dateString) return '-';
     const date = new Date(dateString);
-    return date.toLocaleDateString('da-DK', { day: '2-digit', month: '2-digit' });
+    return date.toLocaleDateString('da-DK', { day: '2-digit', month: '2-digit', year: '2-digit' });
 }
 
 // Fuldt datoformat (dd/mm/åå)
@@ -328,7 +328,7 @@ export default function ApprovalPage() {
                             <thead className="bg-white/30 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 <tr>
                                     {activeTab === 'pending' && (
-                                        <th className="px-2 py-3 w-8">
+                                        <th className="pl-2 pr-1 py-2 w-8">
                                             <input
                                                 type="checkbox"
                                                 checked={selectedIds.length === filteredEntries.length && filteredEntries.length > 0}
@@ -337,25 +337,25 @@ export default function ApprovalPage() {
                                             />
                                         </th>
                                     )}
-                                    <th className="px-2 py-3">Barnepige</th>
-                                    <th className="px-2 py-3">Barn</th>
-                                    <th className="px-2 py-3 text-center">Bevilling</th>
-                                    <th className="px-2 py-3">Dato</th>
-                                    <th className="px-2 py-3">Tid</th>
-                                    <th className="px-2 py-3 text-center">Timer</th>
+                                    <th className="px-1.5 py-2">Barnepige</th>
+                                    <th className="px-1.5 py-2">Barn</th>
+                                    <th className="px-1.5 py-2 text-center">Bevilling</th>
+                                    <th className="px-1.5 py-2">Dato</th>
+                                    <th className="px-1.5 py-2">Tid</th>
+                                    <th className="px-1.5 py-2 text-center">Timer</th>
                                     {activeTab === 'approved' && (
                                         <>
-                                            <th className="px-2 py-3">Godkendt</th>
-                                            <th className="px-2 py-3">Data sendt</th>
+                                            <th className="px-1.5 py-2">Godkendt</th>
+                                            <th className="px-1.5 py-2">Data sendt</th>
                                         </>
                                     )}
                                     {activeTab === 'rejected' && (
                                         <>
-                                            <th className="px-2 py-3">Afvist</th>
-                                            <th className="px-2 py-3">Årsag</th>
+                                            <th className="px-1.5 py-2">Afvist</th>
+                                            <th className="px-1.5 py-2">Årsag</th>
                                         </>
                                     )}
-                                    {activeTab === 'pending' && <th className="px-2 py-3 text-right">Handling</th>}
+                                    {activeTab === 'pending' && <th className="px-1.5 py-2 text-right">Handling</th>}
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/10">
@@ -364,7 +364,7 @@ export default function ApprovalPage() {
                                     return (
                                         <tr key={entry.id} className="hover:bg-white/20 transition-colors">
                                             {activeTab === 'pending' && (
-                                                <td className="px-2 py-2">
+                                                <td className="pl-2 pr-1 py-1.5">
                                                     <input
                                                         type="checkbox"
                                                         checked={selectedIds.includes(entry.id)}
@@ -373,14 +373,14 @@ export default function ApprovalPage() {
                                                     />
                                                 </td>
                                             )}
-                                            <td className="px-2 py-2">
+                                            <td className="px-1.5 py-1.5">
                                                 <div className="font-medium text-gray-900">{entry.caregiver_first_name} {entry.caregiver_last_name}</div>
                                                 <div className="text-xs text-gray-400">{entry.ma_number}</div>
                                             </td>
-                                            <td className="px-2 py-2">
+                                            <td className="px-1.5 py-1.5">
                                                 <div className="font-medium">{entry.child_first_name} {entry.child_last_name}</div>
                                             </td>
-                                            <td className="px-2 py-2 text-center">
+                                            <td className="px-1.5 py-1.5 text-center">
                                                 {grantStatus ? (
                                                     <div className={`leading-tight ${
                                                         grantStatus.isExceeded
@@ -400,19 +400,19 @@ export default function ApprovalPage() {
                                                     <span className="text-gray-400">-</span>
                                                 )}
                                             </td>
-                                            <td className="px-2 py-2">
+                                            <td className="px-1.5 py-1.5">
                                                 <div className="font-medium">{formatShortDate(entry.date)}</div>
                                             </td>
-                                            <td className="px-2 py-2 text-gray-600 whitespace-nowrap">
+                                            <td className="px-1.5 py-1.5 text-gray-600 whitespace-nowrap">
                                                 {entry.start_time?.slice(0,5)}-{entry.end_time?.slice(0,5)}
                                             </td>
-                                            <td className="px-2 py-2 text-center">
+                                            <td className="px-1.5 py-1.5 text-center">
                                                 <span className="font-bold text-[#B54A32]">{formatHours(entry.total_hours)}</span>
                                             </td>
                                             {activeTab === 'approved' && (
                                                 <>
-                                                    <td className="px-2 py-2 text-gray-600">{entry.reviewed_by}</td>
-                                                    <td className="px-2 py-2">
+                                                    <td className="px-1.5 py-1.5 text-gray-600">{entry.reviewed_by}</td>
+                                                    <td className="px-1.5 py-1.5">
                                                         {entry.payroll_date ? (
                                                             <span className="text-emerald-600 text-xs">
                                                                 {formatMediumDate(entry.payroll_date)}
@@ -430,27 +430,27 @@ export default function ApprovalPage() {
                                             )}
                                             {activeTab === 'rejected' && (
                                                 <>
-                                                    <td className="px-2 py-2">
+                                                    <td className="px-1.5 py-1.5">
                                                         <div className="text-gray-600">{entry.reviewed_by}</div>
                                                         <div className="text-xs text-gray-400">{formatShortDate(entry.reviewed_at)}</div>
                                                     </td>
-                                                    <td className="px-2 py-2 text-rose-600 text-xs max-w-32 truncate" title={entry.rejection_reason}>
+                                                    <td className="px-1.5 py-1.5 text-rose-600 text-xs max-w-32 truncate" title={entry.rejection_reason}>
                                                         {entry.rejection_reason}
                                                     </td>
                                                 </>
                                             )}
                                             {activeTab === 'pending' && (
-                                                <td className="px-2 py-2 text-right">
+                                                <td className="px-1.5 py-1.5 text-right">
                                                     <div className="flex gap-1 justify-end">
                                                         <button
                                                             onClick={() => handleApprove(entry.id)}
-                                                            className="px-2.5 py-1 bg-emerald-500 text-white rounded-lg text-xs font-medium hover:bg-emerald-600 transition-all"
+                                                            className="px-2 py-1 bg-emerald-500 text-white rounded-lg text-xs font-medium hover:bg-emerald-600 transition-all"
                                                         >
                                                             Godkend
                                                         </button>
                                                         <button
                                                             onClick={() => setRejectModal({ open: true, entryId: entry.id })}
-                                                            className="px-2.5 py-1 bg-rose-500 text-white rounded-lg text-xs font-medium hover:bg-rose-600 transition-all"
+                                                            className="px-2 py-1 bg-rose-500 text-white rounded-lg text-xs font-medium hover:bg-rose-600 transition-all"
                                                         >
                                                             Afvis
                                                         </button>

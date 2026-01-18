@@ -56,7 +56,8 @@ for (let i = 0; i < childCount; i++) {
     const month = String((i % 12) + 1).padStart(2, '0');
     const day = String((i % 28) + 1).padStart(2, '0');
     const birthDate = `${year}-${month}-${day}`;
-    const pspElement = `PSP-${String(10000 + i * 111).padStart(5, '0')}`;
+    // PSP format: XX-0000000000-0000 (2 bogstaver - 10 tal - 4 tal)
+    const pspElement = `XG-${String(10031 + i).padStart(10, '0')}-${String(i + 1).padStart(4, '0')}`;
     const grantType = grantTypes[i % grantTypes.length];
 
     let grantHours = 0;
