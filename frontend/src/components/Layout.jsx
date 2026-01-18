@@ -97,48 +97,48 @@ export default function Layout({ children, userRole, onRoleChange }) {
     const navItems = userRole === 'admin' ? adminNavItems : caregiverNavItems;
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
-            {/* Header - Kalundborg Kommune themed */}
-            <header className="bg-[#B54A32] shadow-lg">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+        <div className="min-h-screen flex flex-col">
+            {/* Header - Glassmorphism dark */}
+            <header className="glass-dark sticky top-0 z-50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-6">
                             {/* Logo */}
                             <Link to="/" className="flex items-center gap-4 group">
-                                <div className="text-white">
+                                <div className="text-white drop-shadow-lg transition-transform group-hover:scale-105">
                                     <KalundborgLogo />
                                 </div>
-                                <div className="border-l border-white/30 pl-4">
-                                    <h1 className="text-lg font-semibold text-white tracking-wide">
+                                <div className="border-l border-white/20 pl-4">
+                                    <h1 className="text-lg font-bold text-white tracking-wide drop-shadow-md">
                                         KALUNDBORG
                                     </h1>
-                                    <p className="text-white/80 text-xs tracking-widest uppercase">Kommune</p>
+                                    <p className="text-white/70 text-xs tracking-widest uppercase">Kommune</p>
                                 </div>
                             </Link>
 
                             {/* Divider */}
-                            <div className="hidden md:block h-10 w-px bg-white/20"></div>
+                            <div className="hidden md:block h-10 w-px bg-white/10"></div>
 
                             {/* App title */}
                             <div className="hidden md:block">
-                                <h2 className="text-white font-medium">Timeregistrering</h2>
-                                <p className="text-white/70 text-xs">Barnepige-ordningen</p>
+                                <h2 className="text-white font-medium drop-shadow-sm">Timeregistrering</h2>
+                                <p className="text-white/60 text-xs">Barnepige-ordningen</p>
                             </div>
                         </div>
 
                         <div className="flex items-center gap-4">
-                            {/* Role badge */}
-                            <span className="hidden sm:inline-flex px-3 py-1.5 bg-white/10 text-white text-xs font-medium rounded-full border border-white/20">
+                            {/* Role badge - glass style */}
+                            <span className="hidden sm:inline-flex px-4 py-2 bg-white/10 backdrop-blur-sm text-white text-xs font-medium rounded-full border border-white/20 shadow-lg">
                                 {userRole === 'admin' ? 'Administrator' : 'Barnepige'}
                             </span>
 
-                            {/* Role switcher (for demo) */}
+                            {/* Role switcher (for demo) - glass style */}
                             <div className="flex items-center gap-2">
-                                <span className="text-sm text-white/70 hidden sm:inline">Vis som:</span>
+                                <span className="text-sm text-white/60 hidden sm:inline">Vis som:</span>
                                 <select
                                     value={userRole}
                                     onChange={(e) => onRoleChange(e.target.value)}
-                                    className="text-sm bg-white/10 text-white border border-white/20 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-white/30 focus:outline-none cursor-pointer hover:bg-white/20 transition-colors"
+                                    className="text-sm bg-white/10 backdrop-blur-sm text-white border border-white/20 rounded-xl px-4 py-2 focus:ring-2 focus:ring-white/30 focus:outline-none cursor-pointer hover:bg-white/20 transition-all shadow-lg"
                                 >
                                     <option value="admin" className="text-gray-900">Administrator</option>
                                     <option value="caregiver" className="text-gray-900">Barnepige</option>
@@ -149,21 +149,21 @@ export default function Layout({ children, userRole, onRoleChange }) {
                 </div>
             </header>
 
-            {/* Navigation */}
-            <nav className="bg-white border-b shadow-sm sticky top-0 z-40">
+            {/* Navigation - Glassmorphism */}
+            <nav className="glass-card-strong sticky top-[72px] z-40 border-b border-white/20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex gap-1 overflow-x-auto">
+                    <div className="flex gap-2 overflow-x-auto py-2">
                         {navItems.map((item) => (
                             <Link
                                 key={item.path}
                                 to={item.path}
-                                className={`flex items-center gap-2 px-4 py-3.5 text-sm font-medium border-b-2 transition-all whitespace-nowrap ${
+                                className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-xl transition-all whitespace-nowrap ${
                                     isActive(item.path)
-                                        ? 'border-[#B54A32] text-[#B54A32] bg-[#B54A32]/5'
-                                        : 'border-transparent text-gray-600 hover:text-[#B54A32] hover:bg-gray-50'
+                                        ? 'bg-gradient-to-r from-[#B54A32] to-[#9a3f2b] text-white shadow-lg shadow-[#B54A32]/25'
+                                        : 'text-gray-600 hover:bg-white/50 hover:text-[#B54A32] hover:shadow-md'
                                 }`}
                             >
-                                <span className={isActive(item.path) ? 'text-[#B54A32]' : 'text-gray-400'}>
+                                <span className={isActive(item.path) ? 'text-white' : 'text-gray-400'}>
                                     {item.icon}
                                 </span>
                                 {item.label}
@@ -175,20 +175,30 @@ export default function Layout({ children, userRole, onRoleChange }) {
 
             {/* Main content */}
             <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {children}
+                <div className="animate-fade-in">
+                    {children}
+                </div>
             </main>
 
-            {/* Footer */}
-            <footer className="bg-white border-t mt-auto">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
-                        <div className="flex items-center gap-2 text-[#B54A32]">
-                            <KalundborgLogo />
-                            <span className="text-sm font-medium">Kalundborg Kommune</span>
+            {/* Footer - Glassmorphism */}
+            <footer className="glass-card mt-auto border-t border-white/20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-3 text-[#B54A32]">
+                            <div className="p-2 bg-[#B54A32]/10 rounded-xl">
+                                <KalundborgLogo />
+                            </div>
+                            <div>
+                                <span className="text-sm font-semibold block">Kalundborg Kommune</span>
+                                <span className="text-xs text-gray-500">Timeregistrering for Barnepige-ordningen</span>
+                            </div>
                         </div>
-                        <p className="text-sm text-gray-500">
-                            Timeregistrering for Barnepige-ordningen
-                        </p>
+                        <div className="flex items-center gap-4">
+                            <div className="h-1 w-1 rounded-full bg-gray-300 hidden sm:block"></div>
+                            <p className="text-xs text-gray-400">
+                                Glassmorphism Design
+                            </p>
+                        </div>
                     </div>
                 </div>
             </footer>

@@ -32,6 +32,12 @@ const SearchIcon = () => (
     </svg>
 );
 
+const CloseIcon = () => (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    </svg>
+);
+
 export default function CaregiversPage() {
     const [caregivers, setCaregivers] = useState([]);
     const [children, setChildren] = useState([]);
@@ -114,98 +120,133 @@ export default function CaregiversPage() {
     });
 
     return (
-        <div className="space-y-8">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-2xl font-bold text-gray-900">Barnepiger</h2>
-                    <p className="text-gray-500 mt-1">Administrer barnepiger og deres tilknytninger</p>
+        <div className="space-y-6">
+            {/* Header */}
+            <div className="glass-card rounded-2xl p-6 animate-fade-in-up">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900">Barnepiger</h2>
+                        <p className="text-gray-500 mt-1">Administrer barnepiger og deres tilknytninger</p>
+                    </div>
+                    <button
+                        onClick={openCreateModal}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 btn-kalundborg rounded-xl font-medium"
+                    >
+                        <PlusIcon />
+                        Opret barnepige
+                    </button>
                 </div>
-                <button
-                    onClick={openCreateModal}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#B54A32] text-white rounded-lg hover:bg-[#9a3f2b] transition-colors font-medium"
-                >
-                    <PlusIcon />
-                    Opret barnepige
-                </button>
             </div>
 
             {/* Søgefelt */}
-            <div className="relative w-80">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                    <SearchIcon />
+            <div className="glass-card rounded-2xl p-4 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+                <div className="relative w-full sm:w-80">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                        <SearchIcon />
+                    </div>
+                    <input
+                        type="text"
+                        placeholder="Søg barnepige (navn eller MA-nummer)..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="glass-input pl-10 pr-4 py-2.5 rounded-xl text-sm w-full"
+                    />
                 </div>
-                <input
-                    type="text"
-                    placeholder="Søg barnepige (navn eller MA-nummer)..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm w-full focus:ring-2 focus:ring-[#B54A32] focus:border-[#B54A32]"
-                />
             </div>
 
             {loading ? (
                 <div className="flex items-center justify-center py-12">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#B54A32]"></div>
+                    <div className="animate-spin rounded-full h-10 w-10 border-2 border-white/30 border-t-[#B54A32]"></div>
                 </div>
             ) : (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                    <table className="w-full">
-                        <thead className="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <tr>
-                                <th className="px-4 py-3">Navn</th>
-                                <th className="px-4 py-3">MA-nummer</th>
-                                <th className="px-4 py-3">Tilknyttede børn</th>
-                                <th className="px-4 py-3">Handlinger</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                            {filteredCaregivers.map((caregiver) => (
-                                <tr key={caregiver.id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-4 py-3">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 bg-[#B54A32]/10 rounded-full flex items-center justify-center text-[#B54A32] text-xs font-medium">
-                                                {caregiver.first_name?.charAt(0)}{caregiver.last_name?.charAt(0)}
-                                            </div>
-                                            <span className="font-medium text-gray-900">{caregiver.first_name} {caregiver.last_name}</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
-                                            {caregiver.ma_number}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-3 text-sm text-gray-500">
-                                        {caregiver.children?.map(c => c.name).join(', ') || '-'}
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <div className="flex items-center gap-1">
-                                            <button
-                                                onClick={() => openEditModal(caregiver)}
-                                                className="p-1.5 text-gray-500 hover:text-[#B54A32] hover:bg-[#B54A32]/5 rounded transition-colors"
-                                                title="Rediger"
-                                            >
-                                                <EditIcon />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(caregiver.id)}
-                                                className="p-1.5 text-gray-500 hover:text-rose-600 hover:bg-rose-50 rounded transition-colors"
-                                                title="Slet"
-                                            >
-                                                <TrashIcon />
-                                            </button>
-                                        </div>
-                                    </td>
+                <div className="glass-card rounded-2xl overflow-hidden animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead>
+                                <tr className="bg-white/40 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    <th className="px-5 py-4">Navn</th>
+                                    <th className="px-5 py-4">MA-nummer</th>
+                                    <th className="px-5 py-4">Tilknyttede børn</th>
+                                    <th className="px-5 py-4">Handlinger</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="divide-y divide-white/20">
+                                {filteredCaregivers.map((caregiver, index) => (
+                                    <tr
+                                        key={caregiver.id}
+                                        className="hover:bg-white/30 transition-all duration-200"
+                                        style={{ animationDelay: `${0.3 + index * 0.05}s` }}
+                                    >
+                                        <td className="px-5 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 bg-gradient-to-br from-violet-400 to-violet-600 rounded-xl flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-violet-500/20">
+                                                    {caregiver.first_name?.charAt(0)}{caregiver.last_name?.charAt(0)}
+                                                </div>
+                                                <span className="font-semibold text-gray-900">{caregiver.first_name} {caregiver.last_name}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-5 py-4">
+                                            <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-white/50 text-gray-700 border border-white/30">
+                                                {caregiver.ma_number}
+                                            </span>
+                                        </td>
+                                        <td className="px-5 py-4 text-sm text-gray-500">
+                                            {caregiver.children?.length > 0 ? (
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {caregiver.children.map(c => (
+                                                        <span
+                                                            key={c.id}
+                                                            className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#B54A32]/10 text-[#B54A32] border border-[#B54A32]/20"
+                                                        >
+                                                            {c.name}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <span className="text-gray-400">Ingen børn tilknyttet</span>
+                                            )}
+                                        </td>
+                                        <td className="px-5 py-4">
+                                            <div className="flex items-center gap-1">
+                                                <button
+                                                    onClick={() => openEditModal(caregiver)}
+                                                    className="p-2 text-gray-500 hover:text-[#B54A32] hover:bg-white/50 rounded-lg transition-all duration-200"
+                                                    title="Rediger"
+                                                >
+                                                    <EditIcon />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(caregiver.id)}
+                                                    className="p-2 text-gray-500 hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-all duration-200"
+                                                    title="Slet"
+                                                >
+                                                    <TrashIcon />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
 
                     {caregivers.length === 0 && (
                         <div className="p-12 text-center">
-                            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                            <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-5 text-gray-400 shadow-inner">
                                 <UsersIcon />
                             </div>
-                            <p className="text-gray-500">Ingen barnepiger oprettet endnu</p>
+                            <h3 className="text-lg font-semibold text-gray-900">Ingen barnepiger oprettet</h3>
+                            <p className="text-gray-500 mt-1">Opret en barnepige for at komme i gang</p>
+                        </div>
+                    )}
+
+                    {filteredCaregivers.length === 0 && caregivers.length > 0 && (
+                        <div className="p-12 text-center">
+                            <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-5 text-gray-400 shadow-inner">
+                                <SearchIcon />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900">Ingen resultater</h3>
+                            <p className="text-gray-500 mt-1">Prøv at søge efter noget andet</p>
                         </div>
                     )}
                 </div>
@@ -213,53 +254,61 @@ export default function CaregiversPage() {
 
             {/* Edit/Create Modal */}
             {editModal.open && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 bg-[#B54A32]/10 rounded-full flex items-center justify-center text-[#B54A32]">
-                                <UsersIcon />
+                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="glass-card-strong rounded-2xl shadow-2xl p-6 w-full max-w-md animate-scale-in">
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-gradient-to-br from-violet-400 to-violet-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-violet-500/30">
+                                    <UsersIcon />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900">
+                                    {editModal.caregiver ? 'Rediger barnepige' : 'Opret barnepige'}
+                                </h3>
                             </div>
-                            <h3 className="text-lg font-bold text-gray-900">
-                                {editModal.caregiver ? 'Rediger barnepige' : 'Opret barnepige'}
-                            </h3>
+                            <button
+                                onClick={() => setEditModal({ open: false, caregiver: null })}
+                                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white/50 rounded-lg transition-all"
+                            >
+                                <CloseIcon />
+                            </button>
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="space-y-5">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Fornavn *</label>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Fornavn *</label>
                                 <input
                                     type="text"
                                     value={formData.first_name}
                                     onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                                    className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#B54A32] focus:border-[#B54A32]"
+                                    className="glass-input w-full rounded-xl px-4 py-2.5"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Efternavn *</label>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Efternavn *</label>
                                 <input
                                     type="text"
                                     value={formData.last_name}
                                     onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                                    className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#B54A32] focus:border-[#B54A32]"
+                                    className="glass-input w-full rounded-xl px-4 py-2.5"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">MA-nummer *</label>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">MA-nummer *</label>
                                 <input
                                     type="text"
                                     value={formData.ma_number}
                                     onChange={(e) => setFormData({ ...formData, ma_number: e.target.value })}
-                                    className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#B54A32] focus:border-[#B54A32]"
+                                    className="glass-input w-full rounded-xl px-4 py-2.5"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Tilknyttede børn</label>
-                                <div className="border border-gray-200 rounded-lg p-3 max-h-40 overflow-y-auto">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Tilknyttede børn</label>
+                                <div className="glass-card rounded-xl p-3 max-h-40 overflow-y-auto">
                                     {children.map((child) => (
-                                        <label key={child.id} className="flex items-center gap-2 py-1.5 px-1 hover:bg-gray-50 rounded cursor-pointer">
+                                        <label key={child.id} className="flex items-center gap-3 py-2 px-2 hover:bg-white/50 rounded-lg cursor-pointer transition-all">
                                             <input
                                                 type="checkbox"
                                                 checked={formData.child_ids?.includes(child.id)}
@@ -273,26 +322,26 @@ export default function CaregiversPage() {
                                                 }}
                                                 className="rounded border-gray-300 text-[#B54A32] focus:ring-[#B54A32]"
                                             />
-                                            <span className="text-sm text-gray-700">{child.first_name} {child.last_name}</span>
+                                            <span className="text-sm font-medium text-gray-700">{child.first_name} {child.last_name}</span>
                                         </label>
                                     ))}
                                     {children.length === 0 && (
-                                        <div className="text-gray-400 text-sm py-2">Ingen børn oprettet</div>
+                                        <div className="text-gray-400 text-sm py-3 text-center">Ingen børn oprettet</div>
                                     )}
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex gap-3 mt-6 pt-4 border-t border-gray-100">
+                        <div className="flex gap-3 mt-6 pt-5 border-t border-white/20">
                             <button
                                 onClick={handleSave}
-                                className="flex-1 px-4 py-2.5 bg-[#B54A32] text-white rounded-lg hover:bg-[#9a3f2b] font-medium transition-colors"
+                                className="flex-1 px-5 py-3 btn-kalundborg rounded-xl font-semibold"
                             >
                                 Gem
                             </button>
                             <button
                                 onClick={() => setEditModal({ open: false, caregiver: null })}
-                                className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium transition-colors"
+                                className="flex-1 px-5 py-3 bg-white/50 hover:bg-white/70 text-gray-700 rounded-xl font-semibold transition-all border border-white/30"
                             >
                                 Annuller
                             </button>

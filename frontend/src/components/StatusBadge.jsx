@@ -24,13 +24,26 @@ const StatusIcon = ({ status }) => {
 
 export default function StatusBadge({ status }) {
     const statusClasses = {
-        pending: 'bg-amber-50 text-amber-700 border-amber-200',
-        approved: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-        rejected: 'bg-rose-50 text-rose-700 border-rose-200'
+        pending: 'bg-amber-500/10 text-amber-700 border-amber-500/20 shadow-amber-500/10',
+        approved: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20 shadow-emerald-500/10',
+        rejected: 'bg-rose-500/10 text-rose-700 border-rose-500/20 shadow-rose-500/10'
+    };
+
+    const glowClasses = {
+        pending: 'hover:shadow-amber-500/20',
+        approved: 'hover:shadow-emerald-500/20',
+        rejected: 'hover:shadow-rose-500/20'
     };
 
     return (
-        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium ${statusClasses[status] || ''}`}>
+        <span className={`
+            inline-flex items-center gap-1.5 px-3 py-1.5
+            rounded-full border text-xs font-medium
+            backdrop-blur-sm shadow-lg
+            transition-all duration-300
+            ${statusClasses[status] || ''}
+            ${glowClasses[status] || ''}
+        `}>
             <StatusIcon status={status} />
             <span>{translateStatus(status)}</span>
         </span>
