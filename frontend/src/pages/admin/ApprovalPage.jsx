@@ -46,6 +46,7 @@ export default function ApprovalPage() {
     const [entries, setEntries] = useState([]);
     const [children, setChildren] = useState([]);
     const [caregivers, setCaregivers] = useState([]);
+    const [grantSummaries, setGrantSummaries] = useState({});
     const [selectedChild, setSelectedChild] = useState('all');
     const [selectedCaregiver, setSelectedCaregiver] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
@@ -78,6 +79,23 @@ export default function ApprovalPage() {
             setEntries(entriesData);
             setChildren(childrenData);
             setCaregivers(caregiversData);
+
+            // Hent bevillingsstatus for alle børn i entries
+            const uniqueChildIds = [...new Set(entriesData.map(e => e.child_id))];
+            const summaries = {};
+            await Promise.all(
+                uniqueChildIds.map(async (childId) => {
+                    try {
+                        const childData = await childrenApi.getById(childId);
+                        if (childData.grantSummary) {
+                            summaries[childId] = childData.grantSummary;
+                        }
+                    } catch (err) {
+                        console.error(`Kunne ikke hente bevilling for barn ${childId}:`, err);
+                    }
+                })
+            );
+            setGrantSummaries(summaries);
         } catch (error) {
             console.error('Fejl ved indlæsning:', error);
         } finally {
@@ -163,6 +181,24 @@ export default function ApprovalPage() {
         { id: 'approved', label: 'Godkendte', icon: <CheckIcon /> },
         { id: 'rejected', label: 'Afviste', icon: <XIcon /> }
     ];
+
+    // Beregn bevillingsstatus for et barn
+    function getGrantStatus(childId) {
+        const summary = grantSummaries[childId];
+        if (!summary) return null;
+
+        const percentage = summary.grantHours > 0
+            ? (summary.usedHours / summary.grantHours) * 100
+            : 0;
+
+        return {
+            usedHours: summary.usedHours,
+            grantHours: summary.grantHours,
+            percentage,
+            isExceeded: percentage >= 100,
+            isWarning: percentage >= 90 && percentage < 100
+        };
+    }
 
     return (
         <div className="space-y-6">
@@ -297,6 +333,7 @@ export default function ApprovalPage() {
                                     <th className="px-4 py-4">Barnepige</th>
                                     <th className="px-4 py-4">MA-nr.</th>
                                     <th className="px-4 py-4">Barn</th>
+                                    <th className="px-4 py-4">Bevilling</th>
                                     <th className="px-4 py-4">Dato</th>
                                     <th className="px-4 py-4">Tid</th>
                                     <th className="px-4 py-4">Normal</th>
@@ -347,6 +384,24 @@ export default function ApprovalPage() {
                                                     </div>
                                                 )}
                                             </div>
+                                        </td>
+                                        <td className="px-4 py-4">
+                                            {(() => {
+                                                const status = getGrantStatus(entry.child_id);
+                                                if (!status) return <span className="text-gray-400">-</span>;
+
+                                                return (
+                                                    <span className={`text-sm ${
+                                                        status.isExceeded
+                                                            ? 'text-rose-600 font-bold'
+                                                            : status.isWarning
+                                                            ? 'font-bold text-gray-900'
+                                                            : 'text-gray-600'
+                                                    }`}>
+                                                        {formatHours(status.usedHours)}/{formatHours(status.grantHours)}
+                                                    </span>
+                                                );
+                                            })()}
                                         </td>
                                         <td className="px-4 py-4">{formatDate(entry.date)}</td>
                                         <td className="px-4 py-4 text-sm font-medium">
