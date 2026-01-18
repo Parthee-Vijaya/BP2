@@ -60,6 +60,7 @@ export default function ApprovalPage() {
     const [selectedIds, setSelectedIds] = useState([]);
     const [rejectModal, setRejectModal] = useState({ open: false, entryId: null });
     const [rejectReason, setRejectReason] = useState('');
+    const [viewReasonModal, setViewReasonModal] = useState({ open: false, reason: '', entry: null });
 
     useEffect(() => {
         loadData();
@@ -453,8 +454,14 @@ export default function ApprovalPage() {
                                                         <div className="text-xs text-gray-600 truncate">{entry.reviewed_by}</div>
                                                         <div className="text-xs text-gray-400">{formatShortDate(entry.reviewed_at)}</div>
                                                     </td>
-                                                    <td className="px-1 py-1 text-rose-600 text-xs truncate" title={entry.rejection_reason}>
-                                                        {entry.rejection_reason}
+                                                    <td className="px-1 py-1">
+                                                        <button
+                                                            onClick={() => setViewReasonModal({ open: true, reason: entry.rejection_reason, entry })}
+                                                            className="text-rose-600 text-xs truncate block w-full text-left hover:underline cursor-pointer"
+                                                            title="Klik for at se hele årsagen"
+                                                        >
+                                                            {entry.rejection_reason}
+                                                        </button>
                                                     </td>
                                                 </>
                                             )}
@@ -518,6 +525,47 @@ export default function ApprovalPage() {
                                 Annuller
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* View Rejection Reason Modal */}
+            {viewReasonModal.open && (
+                <div
+                    className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in"
+                    onClick={() => setViewReasonModal({ open: false, reason: '', entry: null })}
+                >
+                    <div
+                        className="glass-card-strong rounded-2xl shadow-2xl p-6 w-full max-w-md animate-scale-in"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 bg-gradient-to-br from-rose-400 to-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-rose-500/30">
+                                <XIcon />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-900">Afvisningsårsag</h3>
+                                {viewReasonModal.entry && (
+                                    <p className="text-sm text-gray-500">
+                                        {viewReasonModal.entry.caregiver_first_name} {viewReasonModal.entry.caregiver_last_name} - {viewReasonModal.entry.child_first_name}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                        <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 mb-4">
+                            <p className="text-gray-800 text-sm whitespace-pre-wrap">{viewReasonModal.reason}</p>
+                        </div>
+                        {viewReasonModal.entry && (
+                            <div className="text-xs text-gray-500 mb-4">
+                                Afvist af <span className="font-medium">{viewReasonModal.entry.reviewed_by}</span> den {formatShortDate(viewReasonModal.entry.reviewed_at)}
+                            </div>
+                        )}
+                        <button
+                            onClick={() => setViewReasonModal({ open: false, reason: '', entry: null })}
+                            className="w-full px-5 py-3 bg-white/50 text-gray-700 rounded-xl hover:bg-white/70 font-medium transition-all border border-white/30"
+                        >
+                            Luk
+                        </button>
                     </div>
                 </div>
             )}
