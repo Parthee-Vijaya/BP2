@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { timeEntriesApi, childrenApi, caregiversApi, exportApi } from '../../utils/api';
-import StatusBadge from '../../components/StatusBadge';
 import { formatHours } from '../../utils/helpers';
 
 // Icons
@@ -47,17 +46,11 @@ function formatShortDate(dateString) {
     return date.toLocaleDateString('da-DK', { day: '2-digit', month: '2-digit', year: '2-digit' });
 }
 
-// Fuldt datoformat (dd/mm/åå)
-function formatMediumDate(dateString) {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('da-DK', { day: '2-digit', month: '2-digit', year: '2-digit' });
-}
-
 export default function ApprovalPage() {
     const [activeTab, setActiveTab] = useState('pending');
     const [entries, setEntries] = useState([]);
     const [children, setChildren] = useState([]);
+    const [childrenMap, setChildrenMap] = useState({});
     const [caregivers, setCaregivers] = useState([]);
     const [grantSummaries, setGrantSummaries] = useState({});
     const [selectedChild, setSelectedChild] = useState('all');
@@ -93,6 +86,11 @@ export default function ApprovalPage() {
             setChildren(childrenData);
             setCaregivers(caregiversData);
 
+            // Opret map af børn for hurtig opslag af PSP-element
+            const cMap = {};
+            childrenData.forEach(c => { cMap[c.id] = c; });
+            setChildrenMap(cMap);
+
             // Hent bevillingsstatus for alle børn i entries
             const uniqueChildIds = [...new Set(entriesData.map(e => e.child_id))];
             const summaries = {};
@@ -103,12 +101,15 @@ export default function ApprovalPage() {
                         if (childData.grantSummary) {
                             summaries[childId] = childData.grantSummary;
                         }
+                        // Opdater også childrenMap med fuld data
+                        cMap[childId] = childData;
                     } catch (err) {
                         console.error(`Kunne ikke hente bevilling for barn ${childId}:`, err);
                     }
                 })
             );
             setGrantSummaries(summaries);
+            setChildrenMap({...cMap});
         } catch (error) {
             console.error('Fejl ved indlæsning:', error);
         } finally {
@@ -211,6 +212,17 @@ export default function ApprovalPage() {
             isExceeded: percentage >= 100,
             isWarning: percentage >= 90 && percentage < 100
         };
+    }
+
+    // Formatér timefordeling kompakt
+    function formatTimeBreakdown(entry) {
+        const parts = [];
+        if (entry.normal_hours > 0) parts.push(`N:${formatHours(entry.normal_hours)}`);
+        if (entry.evening_hours > 0) parts.push(`A:${formatHours(entry.evening_hours)}`);
+        if (entry.night_hours > 0) parts.push(`Na:${formatHours(entry.night_hours)}`);
+        if (entry.saturday_hours > 0) parts.push(`L:${formatHours(entry.saturday_hours)}`);
+        if (entry.sunday_holiday_hours > 0) parts.push(`S:${formatHours(entry.sunday_holiday_hours)}`);
+        return parts.length > 0 ? parts.join(' ') : '-';
     }
 
     return (
@@ -324,11 +336,11 @@ export default function ApprovalPage() {
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
+                        <table className="w-full text-sm table-fixed">
                             <thead className="bg-white/30 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 <tr>
                                     {activeTab === 'pending' && (
-                                        <th className="pl-2 pr-1 py-2 w-8">
+                                        <th className="w-8 pl-2 pr-0 py-2">
                                             <input
                                                 type="checkbox"
                                                 checked={selectedIds.length === filteredEntries.length && filteredEntries.length > 0}
@@ -337,34 +349,36 @@ export default function ApprovalPage() {
                                             />
                                         </th>
                                     )}
-                                    <th className="px-1.5 py-2">Barnepige</th>
-                                    <th className="px-1.5 py-2">Barn</th>
-                                    <th className="px-1.5 py-2 text-center">Bevilling</th>
-                                    <th className="px-1.5 py-2">Dato</th>
-                                    <th className="px-1.5 py-2">Tid</th>
-                                    <th className="px-1.5 py-2 text-center">Timer</th>
+                                    <th className="w-28 px-1 py-2">Barnepige</th>
+                                    <th className="w-24 px-1 py-2">Barn</th>
+                                    <th className="w-32 px-1 py-2">PSP-element</th>
+                                    <th className="w-16 px-1 py-2">Bevilling</th>
+                                    <th className="w-24 px-1 py-2">Dato/Tid</th>
+                                    <th className="w-28 px-1 py-2">Fordeling</th>
+                                    <th className="w-12 px-1 py-2 text-center">Total</th>
                                     {activeTab === 'approved' && (
                                         <>
-                                            <th className="px-1.5 py-2">Godkendt</th>
-                                            <th className="px-1.5 py-2">Data sendt</th>
+                                            <th className="w-20 px-1 py-2">Godkendt</th>
+                                            <th className="w-20 px-1 py-2">Sendt</th>
                                         </>
                                     )}
                                     {activeTab === 'rejected' && (
                                         <>
-                                            <th className="px-1.5 py-2">Afvist</th>
-                                            <th className="px-1.5 py-2">Årsag</th>
+                                            <th className="w-20 px-1 py-2">Afvist</th>
+                                            <th className="w-32 px-1 py-2">Årsag</th>
                                         </>
                                     )}
-                                    {activeTab === 'pending' && <th className="px-1.5 py-2 text-right">Handling</th>}
+                                    {activeTab === 'pending' && <th className="w-28 px-1 py-2 text-right">Handling</th>}
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/10">
                                 {filteredEntries.map((entry) => {
                                     const grantStatus = getGrantStatus(entry.child_id);
+                                    const childData = childrenMap[entry.child_id];
                                     return (
                                         <tr key={entry.id} className="hover:bg-white/20 transition-colors">
                                             {activeTab === 'pending' && (
-                                                <td className="pl-2 pr-1 py-1.5">
+                                                <td className="pl-2 pr-0 py-1">
                                                     <input
                                                         type="checkbox"
                                                         checked={selectedIds.includes(entry.id)}
@@ -373,49 +387,54 @@ export default function ApprovalPage() {
                                                     />
                                                 </td>
                                             )}
-                                            <td className="px-1.5 py-1.5">
-                                                <div className="font-medium text-gray-900">{entry.caregiver_first_name} {entry.caregiver_last_name}</div>
+                                            <td className="px-1 py-1">
+                                                <div className="font-medium text-gray-900 truncate">{entry.caregiver_first_name} {entry.caregiver_last_name}</div>
                                                 <div className="text-xs text-gray-400">{entry.ma_number}</div>
                                             </td>
-                                            <td className="px-1.5 py-1.5">
-                                                <div className="font-medium">{entry.child_first_name} {entry.child_last_name}</div>
+                                            <td className="px-1 py-1">
+                                                <div className="font-medium truncate">{entry.child_first_name} {entry.child_last_name}</div>
                                             </td>
-                                            <td className="px-1.5 py-1.5 text-center">
+                                            <td className="px-1 py-1">
+                                                <div className="text-xs text-gray-500 font-mono truncate" title={childData?.psp_element}>
+                                                    {childData?.psp_element || '-'}
+                                                </div>
+                                            </td>
+                                            <td className="px-1 py-1">
                                                 {grantStatus ? (
-                                                    <div className={`leading-tight ${
+                                                    <span className={`text-xs whitespace-nowrap ${
                                                         grantStatus.isExceeded
-                                                            ? 'text-rose-600'
+                                                            ? 'text-rose-600 font-bold'
                                                             : grantStatus.isWarning
-                                                            ? 'text-gray-900'
+                                                            ? 'text-gray-900 font-bold'
                                                             : 'text-gray-600'
                                                     }`}>
-                                                        <div className={grantStatus.isExceeded || grantStatus.isWarning ? 'font-bold' : ''}>
-                                                            {formatHours(grantStatus.usedHours)}
-                                                        </div>
-                                                        <div className="text-xs text-gray-400">
-                                                            / {formatHours(grantStatus.grantHours)}
-                                                        </div>
-                                                    </div>
+                                                        {formatHours(grantStatus.usedHours)}/{formatHours(grantStatus.grantHours)}
+                                                    </span>
                                                 ) : (
-                                                    <span className="text-gray-400">-</span>
+                                                    <span className="text-gray-400 text-xs">-</span>
                                                 )}
                                             </td>
-                                            <td className="px-1.5 py-1.5">
-                                                <div className="font-medium">{formatShortDate(entry.date)}</div>
+                                            <td className="px-1 py-1">
+                                                <div className="text-xs">
+                                                    <div className="font-medium">{formatShortDate(entry.date)}</div>
+                                                    <div className="text-gray-500">{entry.start_time?.slice(0,5)}-{entry.end_time?.slice(0,5)}</div>
+                                                </div>
                                             </td>
-                                            <td className="px-1.5 py-1.5 text-gray-600 whitespace-nowrap">
-                                                {entry.start_time?.slice(0,5)}-{entry.end_time?.slice(0,5)}
+                                            <td className="px-1 py-1">
+                                                <div className="text-xs text-gray-500 truncate" title={formatTimeBreakdown(entry)}>
+                                                    {formatTimeBreakdown(entry)}
+                                                </div>
                                             </td>
-                                            <td className="px-1.5 py-1.5 text-center">
+                                            <td className="px-1 py-1 text-center">
                                                 <span className="font-bold text-[#B54A32]">{formatHours(entry.total_hours)}</span>
                                             </td>
                                             {activeTab === 'approved' && (
                                                 <>
-                                                    <td className="px-1.5 py-1.5 text-gray-600">{entry.reviewed_by}</td>
-                                                    <td className="px-1.5 py-1.5">
+                                                    <td className="px-1 py-1 text-xs text-gray-600 truncate">{entry.reviewed_by}</td>
+                                                    <td className="px-1 py-1">
                                                         {entry.payroll_date ? (
                                                             <span className="text-emerald-600 text-xs">
-                                                                {formatMediumDate(entry.payroll_date)}
+                                                                {formatShortDate(entry.payroll_date)}
                                                             </span>
                                                         ) : (
                                                             <button
@@ -430,27 +449,27 @@ export default function ApprovalPage() {
                                             )}
                                             {activeTab === 'rejected' && (
                                                 <>
-                                                    <td className="px-1.5 py-1.5">
-                                                        <div className="text-gray-600">{entry.reviewed_by}</div>
+                                                    <td className="px-1 py-1">
+                                                        <div className="text-xs text-gray-600 truncate">{entry.reviewed_by}</div>
                                                         <div className="text-xs text-gray-400">{formatShortDate(entry.reviewed_at)}</div>
                                                     </td>
-                                                    <td className="px-1.5 py-1.5 text-rose-600 text-xs max-w-32 truncate" title={entry.rejection_reason}>
+                                                    <td className="px-1 py-1 text-rose-600 text-xs truncate" title={entry.rejection_reason}>
                                                         {entry.rejection_reason}
                                                     </td>
                                                 </>
                                             )}
                                             {activeTab === 'pending' && (
-                                                <td className="px-1.5 py-1.5 text-right">
+                                                <td className="px-1 py-1 text-right">
                                                     <div className="flex gap-1 justify-end">
                                                         <button
                                                             onClick={() => handleApprove(entry.id)}
-                                                            className="px-2 py-1 bg-emerald-500 text-white rounded-lg text-xs font-medium hover:bg-emerald-600 transition-all"
+                                                            className="px-2 py-1 bg-emerald-500 text-white rounded text-xs font-medium hover:bg-emerald-600 transition-all"
                                                         >
                                                             Godkend
                                                         </button>
                                                         <button
                                                             onClick={() => setRejectModal({ open: true, entryId: entry.id })}
-                                                            className="px-2 py-1 bg-rose-500 text-white rounded-lg text-xs font-medium hover:bg-rose-600 transition-all"
+                                                            className="px-2 py-1 bg-rose-500 text-white rounded text-xs font-medium hover:bg-rose-600 transition-all"
                                                         >
                                                             Afvis
                                                         </button>
