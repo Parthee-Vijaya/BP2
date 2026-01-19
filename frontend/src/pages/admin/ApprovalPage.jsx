@@ -292,7 +292,7 @@ export default function ApprovalPage() {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="glass-card rounded-2xl p-6 animate-fade-in">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 animate-fade-in">
                 <div className="flex items-center justify-between mb-4">
                     <div>
                         <h2 className="text-2xl font-bold text-gray-900">Godkendelse af timer</h2>
@@ -300,7 +300,7 @@ export default function ApprovalPage() {
                     </div>
                     <div className="flex items-center gap-3">
                         {/* View toggle */}
-                        <div className="flex bg-white/50 rounded-xl p-1 border border-white/30">
+                        <div className="flex bg-gray-100 rounded-xl p-1 border border-gray-200">
                             <button
                                 onClick={() => setIsCompactView(false)}
                                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -339,7 +339,7 @@ export default function ApprovalPage() {
                 {/* Stats cards */}
                 {activeTab === 'pending' && filteredEntries.length > 0 && (
                     <div className="grid grid-cols-3 gap-4 mt-4">
-                        <div className="bg-white/50 rounded-xl p-4 border border-white/30">
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                             <div className="text-3xl font-bold text-gray-900">{filteredEntries.length}</div>
                             <div className="text-sm text-gray-500">Afventer godkendelse</div>
                         </div>
@@ -359,9 +359,9 @@ export default function ApprovalPage() {
             </div>
 
             {/* Main Content */}
-            <div className="glass-card rounded-2xl overflow-hidden animate-fade-in-up">
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-200 animate-fade-in-up">
                 {/* Tabs */}
-                <div className="border-b border-white/20 flex bg-white/40">
+                <div className="border-b border-gray-200 flex bg-gray-50">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
@@ -369,7 +369,7 @@ export default function ApprovalPage() {
                             className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-all relative ${
                                 activeTab === tab.id
                                     ? 'text-[#B54A32]'
-                                    : 'text-gray-500 hover:text-gray-900 hover:bg-white/30'
+                                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
                             }`}
                         >
                             <span className={activeTab === tab.id ? 'text-[#B54A32]' : 'text-gray-400'}>
@@ -384,7 +384,7 @@ export default function ApprovalPage() {
                 </div>
 
                 {/* Filters */}
-                <div className="p-4 bg-white/30 border-b border-white/20">
+                <div className="p-4 bg-white border-b border-gray-200">
                     <div className="flex flex-wrap items-center gap-3">
                         <div className="relative flex-1 max-w-xs">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
@@ -395,14 +395,14 @@ export default function ApprovalPage() {
                                 placeholder="Søg på navn eller MA-nummer..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 bg-white/70 border border-white/30 rounded-xl text-sm focus:ring-2 focus:ring-[#B54A32]/20 focus:border-[#B54A32]/30 transition-all"
+                                className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[#B54A32]/20 focus:border-[#B54A32]/30 transition-all"
                             />
                         </div>
 
                         <select
                             value={selectedChild}
                             onChange={(e) => setSelectedChild(e.target.value)}
-                            className="px-4 py-2.5 bg-white/70 border border-white/30 rounded-xl text-sm focus:ring-2 focus:ring-[#B54A32]/20"
+                            className="px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[#B54A32]/20"
                         >
                             <option value="all">Alle børn</option>
                             {children.map((child) => (
@@ -415,7 +415,7 @@ export default function ApprovalPage() {
                         <select
                             value={selectedCaregiver}
                             onChange={(e) => setSelectedCaregiver(e.target.value)}
-                            className="px-4 py-2.5 bg-white/70 border border-white/30 rounded-xl text-sm focus:ring-2 focus:ring-[#B54A32]/20"
+                            className="px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[#B54A32]/20"
                         >
                             <option value="all">Alle barnepiger</option>
                             {caregivers.map((cg) => (
@@ -642,12 +642,12 @@ export default function ApprovalPage() {
                                     <div
                                         key={entry.id}
                                         className={`
-                                            relative rounded-xl border-2 transition-all duration-200
+                                            relative rounded-xl border transition-all duration-200
                                             ${isExceeded
-                                                ? 'bg-gradient-to-r from-rose-50 to-rose-100/50 border-rose-300 shadow-lg shadow-rose-500/10'
+                                                ? 'bg-rose-50 border-rose-300 shadow-sm'
                                                 : isWarning
-                                                ? 'bg-gradient-to-r from-amber-50 to-amber-100/50 border-amber-300 shadow-lg shadow-amber-500/10'
-                                                : 'bg-white/60 border-white/40 hover:border-gray-200 hover:shadow-md'
+                                                ? 'bg-amber-50 border-amber-300 shadow-sm'
+                                                : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
                                             }
                                         `}
                                     >

@@ -98,8 +98,8 @@ export default function Layout({ children, userRole, onRoleChange }) {
 
     return (
         <div className="min-h-screen flex flex-col">
-            {/* Header - Glassmorphism dark */}
-            <header className="glass-dark sticky top-0 z-50">
+            {/* Header - Kalundborg rød */}
+            <header className="bg-[#B54A32] sticky top-0 z-50 shadow-lg">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-6">
@@ -149,8 +149,8 @@ export default function Layout({ children, userRole, onRoleChange }) {
                 </div>
             </header>
 
-            {/* Navigation - Glassmorphism */}
-            <nav className="glass-card-strong sticky top-[72px] z-40 border-b border-white/20">
+            {/* Navigation - Hvid baggrund */}
+            <nav className="bg-white sticky top-[72px] z-40 border-b border-gray-200 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex gap-2 overflow-x-auto py-2">
                         {navItems.map((item) => (
@@ -180,8 +180,8 @@ export default function Layout({ children, userRole, onRoleChange }) {
                 </div>
             </main>
 
-            {/* Footer - Glassmorphism */}
-            <footer className="glass-card mt-auto border-t border-white/20">
+            {/* Footer - Hvid baggrund */}
+            <footer className="bg-white mt-auto border-t border-gray-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div className="flex items-center gap-3 text-[#B54A32]">
@@ -196,7 +196,7 @@ export default function Layout({ children, userRole, onRoleChange }) {
                         <div className="flex items-center gap-4">
                             <div className="h-1 w-1 rounded-full bg-gray-300 hidden sm:block"></div>
                             <p className="text-xs text-gray-400">
-                                Glassmorphism Design
+                                Kalundborg Kommune
                             </p>
                         </div>
                     </div>
