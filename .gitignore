@@ -11,8 +11,8 @@ build/
 .env.*.local
 
 # Database
-*.sqlite
-*.sqlite3
+# *.sqlite
+# *.sqlite3
 *.db
 
 # IDE
