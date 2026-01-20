@@ -282,12 +282,8 @@ export default function ApprovalPage() {
         return parts;
     }
 
-    // Beregn statistik
+    // Beregn statistik - kun overskridelser
     const exceededCount = filteredEntries.filter(e => getGrantStatus(e.child_id)?.isExceeded).length;
-    const warningCount = filteredEntries.filter(e => {
-        const status = getGrantStatus(e.child_id);
-        return status?.isWarning && !status?.isExceeded;
-    }).length;
 
     return (
         <div className="space-y-6">
@@ -338,7 +334,7 @@ export default function ApprovalPage() {
 
                 {/* Stats cards */}
                 {activeTab === 'pending' && filteredEntries.length > 0 && (
-                    <div className="grid grid-cols-3 gap-4 mt-4">
+                    <div className="grid grid-cols-2 gap-4 mt-4">
                         <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                             <div className="text-3xl font-bold text-gray-900">{filteredEntries.length}</div>
                             <div className="text-sm text-gray-500">Afventer godkendelse</div>
@@ -349,10 +345,6 @@ export default function ApprovalPage() {
                                 {exceededCount > 0 && <WarningIcon className="text-rose-500" />}
                             </div>
                             <div className="text-sm text-rose-600">Overskrider bevilling</div>
-                        </div>
-                        <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
-                            <div className="text-3xl font-bold text-amber-600">{warningCount}</div>
-                            <div className="text-sm text-amber-600">Tæt på grænsen</div>
                         </div>
                     </div>
                 )}
@@ -508,8 +500,6 @@ export default function ApprovalPage() {
                                                 transition-colors
                                                 ${activeTab === 'pending' && isExceeded
                                                     ? 'bg-rose-50 hover:bg-rose-100'
-                                                    : activeTab === 'pending' && isWarning
-                                                    ? 'bg-amber-50 hover:bg-amber-100'
                                                     : 'hover:bg-gray-50'
                                                 }
                                             `}
@@ -526,19 +516,10 @@ export default function ApprovalPage() {
                                             )}
                                             {activeTab === 'pending' && (
                                                 <td className="px-4 py-3">
-                                                    {isExceeded ? (
+                                                    {isExceeded && (
                                                         <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-rose-500 text-white text-xs font-bold rounded-full">
                                                             <WarningIcon className="w-3 h-3" />
                                                             OVER
-                                                        </span>
-                                                    ) : isWarning ? (
-                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-500 text-white text-xs font-bold rounded-full">
-                                                            <WarningIcon className="w-3 h-3" />
-                                                            TÆT
-                                                        </span>
-                                                    ) : (
-                                                        <span className="inline-flex items-center px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full">
-                                                            OK
                                                         </span>
                                                     )}
                                                 </td>
@@ -649,17 +630,13 @@ export default function ApprovalPage() {
                                             relative rounded-xl border transition-all duration-200
                                             ${activeTab === 'pending' && isExceeded
                                                 ? 'bg-rose-50 border-rose-300 shadow-sm'
-                                                : activeTab === 'pending' && isWarning
-                                                ? 'bg-amber-50 border-amber-300 shadow-sm'
                                                 : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
                                             }
                                         `}
                                     >
-                                        {/* Status indicator stripe - kun ved pending */}
-                                        {activeTab === 'pending' && (
-                                            <div className={`absolute left-0 top-0 bottom-0 w-1.5 rounded-l-xl ${
-                                                isExceeded ? 'bg-rose-500' : isWarning ? 'bg-amber-500' : 'bg-emerald-500'
-                                            }`} />
+                                        {/* Status indicator stripe - kun ved pending og overskridelse */}
+                                        {activeTab === 'pending' && isExceeded && (
+                                            <div className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-xl bg-rose-500" />
                                         )}
 
                                         <div className="p-4 pl-6">
@@ -681,20 +658,12 @@ export default function ApprovalPage() {
                                                     <div className="flex items-start justify-between gap-4">
                                                         {/* Left side - People info */}
                                                         <div className="flex-1">
-                                                            {activeTab === 'pending' && (
+                                                            {activeTab === 'pending' && isExceeded && (
                                                                 <div className="flex items-center gap-3 mb-2">
-                                                                    {isExceeded && (
-                                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-rose-500 text-white text-xs font-bold rounded-full">
-                                                                            <WarningIcon className="w-3 h-3" />
-                                                                            OVERSKREDET
-                                                                        </span>
-                                                                    )}
-                                                                    {isWarning && (
-                                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-500 text-white text-xs font-bold rounded-full">
-                                                                            <WarningIcon className="w-3 h-3" />
-                                                                            TÆT PÅ
-                                                                        </span>
-                                                                    )}
+                                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-rose-500 text-white text-xs font-bold rounded-full">
+                                                                        <WarningIcon className="w-3 h-3" />
+                                                                        OVERSKREDET
+                                                                    </span>
                                                                 </div>
                                                             )}
 
