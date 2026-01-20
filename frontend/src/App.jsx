@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 
@@ -20,8 +20,25 @@ export default function App() {
     // Demo barnepige ID (i produktion ville dette komme fra auth)
     const caregiverId = 1;
 
+    // Mobilvisning state
+    const [isMobileView, setIsMobileView] = useState(false);
+
+    // Anvend mobilvisning klasse på body
+    useEffect(() => {
+        if (isMobileView) {
+            document.body.classList.add('mobile-view');
+        } else {
+            document.body.classList.remove('mobile-view');
+        }
+    }, [isMobileView]);
+
     return (
-        <Layout userRole={userRole} onRoleChange={setUserRole}>
+        <Layout
+            userRole={userRole}
+            onRoleChange={setUserRole}
+            isMobileView={isMobileView}
+            onMobileViewChange={setIsMobileView}
+        >
             <Routes>
                 {/* Root redirect */}
                 <Route

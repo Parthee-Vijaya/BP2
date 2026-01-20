@@ -42,6 +42,19 @@ const KalundborgLogo = () => (
     </svg>
 );
 
+// Mobile/Desktop icons
+const MobileIcon = () => (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+    </svg>
+);
+
+const DesktopIcon = () => (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    </svg>
+);
+
 // SVG Icons
 const Icons = {
     dashboard: (
@@ -76,7 +89,7 @@ const Icons = {
     )
 };
 
-export default function Layout({ children, userRole, onRoleChange }) {
+export default function Layout({ children, userRole, onRoleChange, isMobileView, onMobileViewChange }) {
     const location = useLocation();
 
     const isActive = (path) => location.pathname === path;
@@ -127,6 +140,20 @@ export default function Layout({ children, userRole, onRoleChange }) {
                         </div>
 
                         <div className="flex items-center gap-4">
+                            {/* Mobile/Desktop toggle */}
+                            <button
+                                onClick={() => onMobileViewChange(!isMobileView)}
+                                className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all border ${
+                                    isMobileView
+                                        ? 'bg-white text-[#B54A32] border-white shadow-lg'
+                                        : 'bg-white/10 text-white border-white/20 hover:bg-white/20'
+                                }`}
+                                title={isMobileView ? 'Skift til desktop visning' : 'Skift til mobil visning'}
+                            >
+                                {isMobileView ? <MobileIcon /> : <DesktopIcon />}
+                                <span className="hidden sm:inline">{isMobileView ? 'Mobil' : 'Desktop'}</span>
+                            </button>
+
                             {/* Role badge - glass style */}
                             <span className="hidden sm:inline-flex px-4 py-2 bg-white/10 backdrop-blur-sm text-white text-xs font-medium rounded-full border border-white/20 shadow-lg">
                                 {userRole === 'admin' ? 'Administrator' : 'Barnepige'}

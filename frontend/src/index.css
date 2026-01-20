@@ -316,3 +316,170 @@ body {
     background: rgba(0, 0, 0, 0.85);
   }
 }
+
+/* ==========================================
+   MOBILE VIEW SIMULATION
+   ========================================== */
+
+/* Når mobile-view klasse er aktiv, simuler mobil viewport */
+body.mobile-view {
+  max-width: 430px;
+  margin: 0 auto;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.2);
+  min-height: 100vh;
+  position: relative;
+  background: #f5f5f5;
+}
+
+body.mobile-view::before {
+  content: 'Mobilvisning (430px)';
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #B54A32;
+  color: white;
+  padding: 4px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 0 0 8px 8px;
+  z-index: 9999;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Mobile view overrides */
+body.mobile-view .max-w-7xl {
+  max-width: 100%;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+body.mobile-view header {
+  padding-top: 28px; /* Plads til "Mobilvisning" label */
+}
+
+/* Skjul desktop-only elementer i mobilvisning */
+body.mobile-view .hidden-mobile {
+  display: none !important;
+}
+
+/* Vis mobile-only elementer */
+body.mobile-view .mobile-only {
+  display: block !important;
+}
+
+/* Tilpas navigation i mobilvisning */
+body.mobile-view nav .flex.gap-2 {
+  gap: 4px;
+}
+
+body.mobile-view nav a {
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+body.mobile-view nav a span:first-child {
+  display: none; /* Skjul ikoner */
+}
+
+/* Tilpas tabeller i mobilvisning */
+body.mobile-view table {
+  font-size: 13px;
+}
+
+body.mobile-view th,
+body.mobile-view td {
+  padding: 8px 6px;
+}
+
+/* Tilpas kort i mobilvisning */
+body.mobile-view .glass-card,
+body.mobile-view .glass-card-strong,
+body.mobile-view .bg-white.rounded-2xl {
+  padding: 12px;
+  border-radius: 12px;
+}
+
+/* Tilpas grid i mobilvisning */
+body.mobile-view .grid-cols-2,
+body.mobile-view .grid-cols-3 {
+  grid-template-columns: 1fr;
+}
+
+body.mobile-view .md\:grid-cols-3 {
+  grid-template-columns: 1fr;
+}
+
+/* Tilpas header i mobilvisning */
+body.mobile-view header .flex.items-center.gap-6 {
+  gap: 12px;
+}
+
+body.mobile-view header .border-l {
+  display: none;
+}
+
+body.mobile-view header h1 {
+  font-size: 14px;
+}
+
+body.mobile-view header .hidden.md\:block {
+  display: none !important;
+}
+
+/* Tilpas footer i mobilvisning */
+body.mobile-view footer {
+  padding: 12px;
+}
+
+body.mobile-view footer .flex-col.sm\:flex-row {
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Tilpas knapper i mobilvisning */
+body.mobile-view button,
+body.mobile-view a.inline-flex {
+  font-size: 13px;
+  padding: 8px 12px;
+}
+
+/* Tilpas inputs i mobilvisning */
+body.mobile-view input,
+body.mobile-view select,
+body.mobile-view textarea {
+  font-size: 16px; /* Forhindrer zoom på iOS */
+  padding: 10px 12px;
+}
+
+/* Tilpas modal i mobilvisning */
+body.mobile-view .fixed.inset-0 .w-full.max-w-md {
+  max-width: calc(100% - 24px);
+  margin: 12px;
+}
+
+/* Stack elementer vertikalt i mobilvisning */
+body.mobile-view .flex.items-center.justify-between {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+body.mobile-view .flex.items-center.gap-4 {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Specifikke tilpasninger til godkendelsessiden */
+body.mobile-view .flex.flex-wrap.items-center.gap-3 {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+body.mobile-view .flex.flex-wrap.items-center.gap-3 > * {
+  width: 100%;
+}
+
+body.mobile-view .flex.flex-wrap.items-center.gap-3 .ml-auto {
+  margin-left: 0;
+}
