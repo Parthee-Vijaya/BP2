@@ -258,20 +258,28 @@ export default function ChildrenPage() {
                                             )}
                                         </td>
                                         <td className="px-5 py-4">
-                                            {child.has_frame_grant ? (
-                                                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-500/15 text-purple-700 border border-purple-500/20 backdrop-blur-sm">
-                                                    Rammebevilling
-                                                </span>
-                                            ) : (
+                                            <div className="space-y-1">
                                                 <span className="text-sm text-gray-600">{translateGrantType(child.grant_type)}</span>
-                                            )}
+                                                {child.has_frame_grant && (
+                                                    <span className="block inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-500/15 text-purple-700 border border-purple-500/20 backdrop-blur-sm">
+                                                        + Rammebevilling
+                                                    </span>
+                                                )}
+                                            </div>
                                         </td>
                                         <td className="px-5 py-4 text-sm text-gray-600">
-                                            {child.has_frame_grant
-                                                ? `${child.frame_hours} timer/år`
-                                                : child.grant_type === 'specific_weekdays'
-                                                ? 'Pr. ugedag'
-                                                : `${child.grant_hours} timer`}
+                                            <div className="space-y-1">
+                                                <div>
+                                                    {child.grant_type === 'specific_weekdays'
+                                                        ? 'Pr. ugedag'
+                                                        : `${child.grant_hours} timer/${translateGrantType(child.grant_type).toLowerCase()}`}
+                                                </div>
+                                                {child.has_frame_grant && (
+                                                    <div className="text-purple-600 font-medium">
+                                                        {child.frame_hours} timer/år (ramme)
+                                                    </div>
+                                                )}
+                                            </div>
                                         </td>
                                         <td className="px-5 py-4 text-sm text-gray-500">
                                             {child.caregivers?.map(c => c.name).join(', ') || '-'}
@@ -467,16 +475,26 @@ export default function ChildrenPage() {
                                                     />
                                                     <span className="w-16 text-sm font-medium text-gray-700">{translateWeekday(day)}:</span>
                                                     <input
-                                                        type="number"
-                                                        value={formData.grant_weekdays?.[day] || 0}
+                                                        type="text"
+                                                        inputMode="decimal"
+                                                        value={formData.grant_weekdays?.[day] || ''}
                                                         onChange={(e) => {
+                                                            const value = e.target.value;
+                                                            // Tillad kun tal og komma/punktum
+                                                            if (value === '' || /^[0-9]*[.,]?[0-9]*$/.test(value)) {
+                                                                const weekdays = { ...formData.grant_weekdays };
+                                                                weekdays[day] = value;
+                                                                setFormData({ ...formData, grant_weekdays: weekdays });
+                                                            }
+                                                        }}
+                                                        onBlur={(e) => {
+                                                            // Konverter til tal ved blur
                                                             const weekdays = { ...formData.grant_weekdays };
-                                                            weekdays[day] = parseFloat(e.target.value) || 0;
+                                                            weekdays[day] = parseFloat(e.target.value.replace(',', '.')) || 0;
                                                             setFormData({ ...formData, grant_weekdays: weekdays });
                                                         }}
+                                                        placeholder="0"
                                                         className="w-16 glass-input rounded-lg px-2 py-1 text-sm"
-                                                        min="0"
-                                                        step="0.5"
                                                     />
                                                     <span className="text-xs text-gray-400">timer</span>
                                                 </div>
@@ -489,12 +507,22 @@ export default function ChildrenPage() {
                                             Bevilling (timer pr. {translateGrantType(formData.grant_type).toLowerCase()})
                                         </label>
                                         <input
-                                            type="number"
+                                            type="text"
+                                            inputMode="decimal"
                                             value={formData.grant_hours}
-                                            onChange={(e) => setFormData({ ...formData, grant_hours: parseFloat(e.target.value) || 0 })}
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                // Tillad kun tal og komma/punktum
+                                                if (value === '' || /^[0-9]*[.,]?[0-9]*$/.test(value)) {
+                                                    setFormData({ ...formData, grant_hours: value });
+                                                }
+                                            }}
+                                            onBlur={(e) => {
+                                                // Konverter til tal ved blur
+                                                setFormData({ ...formData, grant_hours: parseFloat(e.target.value.replace(',', '.')) || 0 });
+                                            }}
+                                            placeholder="0"
                                             className="glass-input w-full rounded-xl px-4 py-2.5"
-                                            min="0"
-                                            step="0.5"
                                         />
                                     </div>
                                 )}
@@ -518,12 +546,22 @@ export default function ChildrenPage() {
                                     <div className="mt-4">
                                         <label className="block text-sm font-semibold text-gray-700 mb-2">Rammebevilling (timer pr. år)</label>
                                         <input
-                                            type="number"
+                                            type="text"
+                                            inputMode="decimal"
                                             value={formData.frame_hours}
-                                            onChange={(e) => setFormData({ ...formData, frame_hours: parseFloat(e.target.value) || 0 })}
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                // Tillad kun tal og komma/punktum
+                                                if (value === '' || /^[0-9]*[.,]?[0-9]*$/.test(value)) {
+                                                    setFormData({ ...formData, frame_hours: value });
+                                                }
+                                            }}
+                                            onBlur={(e) => {
+                                                // Konverter til tal ved blur
+                                                setFormData({ ...formData, frame_hours: parseFloat(e.target.value.replace(',', '.')) || 0 });
+                                            }}
+                                            placeholder="0"
                                             className="glass-input w-full rounded-xl px-4 py-2.5"
-                                            min="0"
-                                            step="0.5"
                                         />
                                         <p className="text-xs text-purple-600/70 mt-2">Rammebevilling overruler den normale bevillingstype når aktiveret</p>
                                     </div>

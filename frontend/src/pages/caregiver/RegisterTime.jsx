@@ -42,10 +42,12 @@ export default function RegisterTime({ caregiverId = 1 }) {
         date: new Date().toISOString().split('T')[0],
         start_time: '',
         end_time: '',
-        comment: ''
+        comment: '',
+        use_frame_grant: false // Vælg om rammebevilling skal bruges
     });
 
     const [preview, setPreview] = useState(null);
+    const [selectedChild, setSelectedChild] = useState(null);
 
     useEffect(() => {
         loadCaregiver();
@@ -56,7 +58,7 @@ export default function RegisterTime({ caregiverId = 1 }) {
         if (formData.child_id && formData.date && formData.start_time && formData.end_time) {
             loadPreview();
         }
-    }, [formData.child_id, formData.date, formData.start_time, formData.end_time]);
+    }, [formData.child_id, formData.date, formData.start_time, formData.end_time, formData.use_frame_grant]);
 
     async function loadCaregiver() {
         try {
@@ -75,7 +77,8 @@ export default function RegisterTime({ caregiverId = 1 }) {
                 child_id: parseInt(formData.child_id),
                 date: formData.date,
                 start_time: formData.start_time,
-                end_time: formData.end_time
+                end_time: formData.end_time,
+                use_frame_grant: formData.use_frame_grant
             });
             setPreview(result);
         } catch (error) {
@@ -106,7 +109,8 @@ export default function RegisterTime({ caregiverId = 1 }) {
                 date: formData.date,
                 start_time: formData.start_time,
                 end_time: formData.end_time,
-                comment: formData.comment
+                comment: formData.comment,
+                use_frame_grant: formData.use_frame_grant
             });
 
             alert('Registrering oprettet!');
@@ -165,7 +169,16 @@ export default function RegisterTime({ caregiverId = 1 }) {
                         <label className="block text-sm font-semibold text-gray-700 mb-2">Barn *</label>
                         <select
                             value={formData.child_id}
-                            onChange={(e) => setFormData({ ...formData, child_id: e.target.value })}
+                            onChange={(e) => {
+                                const childId = e.target.value;
+                                const child = caregiver.children.find(c => c.id === parseInt(childId));
+                                setSelectedChild(child);
+                                setFormData({
+                                    ...formData,
+                                    child_id: childId,
+                                    use_frame_grant: false // Reset ved barneskift
+                                });
+                            }}
                             className="glass-input w-full rounded-xl px-4 py-3"
                             required
                         >
@@ -177,6 +190,49 @@ export default function RegisterTime({ caregiverId = 1 }) {
                             ))}
                         </select>
                     </div>
+
+                    {/* Bevillingstype valg - vises kun hvis barnet har rammebevilling */}
+                    {selectedChild?.has_frame_grant && (
+                        <div className="p-4 bg-purple-50 rounded-xl border border-purple-200">
+                            <label className="block text-sm font-semibold text-gray-700 mb-3">Vælg bevillingstype *</label>
+                            <div className="space-y-3">
+                                <label className="flex items-start gap-3 p-3 bg-white rounded-lg border border-gray-200 cursor-pointer hover:border-[#B54A32]/30 transition-all">
+                                    <input
+                                        type="radio"
+                                        name="grant_type"
+                                        checked={!formData.use_frame_grant}
+                                        onChange={() => setFormData({ ...formData, use_frame_grant: false })}
+                                        className="mt-1 text-[#B54A32] focus:ring-[#B54A32]"
+                                    />
+                                    <div>
+                                        <div className="font-medium text-gray-900">Normal bevilling</div>
+                                        <div className="text-sm text-gray-500">
+                                            {selectedChild.grant_hours} timer pr. {selectedChild.grant_type === 'week' ? 'uge' :
+                                                selectedChild.grant_type === 'month' ? 'måned' :
+                                                selectedChild.grant_type === 'quarter' ? 'kvartal' :
+                                                selectedChild.grant_type === 'half_year' ? 'halvår' :
+                                                selectedChild.grant_type === 'year' ? 'år' : 'periode'}
+                                        </div>
+                                    </div>
+                                </label>
+                                <label className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg border border-purple-200 cursor-pointer hover:border-purple-400 transition-all">
+                                    <input
+                                        type="radio"
+                                        name="grant_type"
+                                        checked={formData.use_frame_grant}
+                                        onChange={() => setFormData({ ...formData, use_frame_grant: true })}
+                                        className="mt-1 text-purple-600 focus:ring-purple-500"
+                                    />
+                                    <div>
+                                        <div className="font-medium text-purple-700">Rammebevilling</div>
+                                        <div className="text-sm text-purple-600">
+                                            {selectedChild.frame_hours} timer pr. år
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Dato */}
                     <div>
