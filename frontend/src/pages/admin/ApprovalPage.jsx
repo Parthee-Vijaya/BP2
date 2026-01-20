@@ -95,7 +95,7 @@ function getDayName(dateString) {
     return date.toLocaleDateString('da-DK', { weekday: 'short' });
 }
 
-export default function ApprovalPage() {
+export default function ApprovalPage({ isMobileView = false }) {
     const [activeTab, setActiveTab] = useState('pending');
     const [entries, setEntries] = useState([]);
     const [children, setChildren] = useState([]);
@@ -112,6 +112,9 @@ export default function ApprovalPage() {
     const [viewReasonModal, setViewReasonModal] = useState({ open: false, reason: '', entry: null });
     const [isCompactView, setIsCompactView] = useState(false);
     const [sortDirection, setSortDirection] = useState('desc'); // 'asc' or 'desc' for date sorting
+
+    // Automatisk kompakt visning på mobil
+    const effectiveCompactView = isMobileView || isCompactView;
 
     useEffect(() => {
         loadData();
@@ -323,7 +326,7 @@ export default function ApprovalPage() {
                             <button
                                 onClick={() => setIsCompactView(false)}
                                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                                    !isCompactView
+                                    !effectiveCompactView
                                         ? 'bg-white text-[#B54A32] shadow-md'
                                         : 'text-gray-500 hover:text-gray-700'
                                 }`}
@@ -334,7 +337,7 @@ export default function ApprovalPage() {
                             <button
                                 onClick={() => setIsCompactView(true)}
                                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                                    isCompactView
+                                    effectiveCompactView
                                         ? 'bg-white text-[#B54A32] shadow-md'
                                         : 'text-gray-500 hover:text-gray-700'
                                 }`}
@@ -493,7 +496,7 @@ export default function ApprovalPage() {
                             {searchQuery ? 'Prøv at justere din søgning' : 'Der er ingen registreringer i denne kategori'}
                         </p>
                     </div>
-                ) : isCompactView ? (
+                ) : effectiveCompactView ? (
                     /* COMPACT TABLE VIEW */
                     <div className="overflow-x-auto">
                         <table className="w-full">

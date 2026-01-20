@@ -483,3 +483,284 @@ body.mobile-view .flex.flex-wrap.items-center.gap-3 > * {
 body.mobile-view .flex.flex-wrap.items-center.gap-3 .ml-auto {
   margin-left: 0;
 }
+
+/* ==========================================
+   MOBILE VIEW - KOMPAKT TABELLER
+   ========================================== */
+
+/* Konverter tabeller til kort-visning på mobil */
+body.mobile-view table {
+  display: block;
+  width: 100%;
+}
+
+body.mobile-view table thead {
+  display: none; /* Skjul header på mobil */
+}
+
+body.mobile-view table tbody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+body.mobile-view table tbody tr {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+body.mobile-view table tbody tr td {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 6px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+body.mobile-view table tbody tr td:last-child {
+  border-bottom: none;
+  padding-top: 12px;
+  justify-content: center;
+}
+
+/* Tilføj labels før indhold via data attributter */
+body.mobile-view table tbody tr td::before {
+  content: attr(data-label);
+  font-weight: 600;
+  font-size: 11px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+/* ==========================================
+   MOBILE VIEW - KOMPAKTE KORT
+   ========================================== */
+
+/* Kompakt kort-visning */
+body.mobile-view .grid.gap-3 {
+  gap: 8px;
+}
+
+body.mobile-view .relative.rounded-xl.border {
+  padding: 10px !important;
+}
+
+body.mobile-view .relative.rounded-xl.border .p-4 {
+  padding: 0 !important;
+}
+
+body.mobile-view .relative.rounded-xl.border .pl-6 {
+  padding-left: 10px !important;
+}
+
+/* Kompakt timefordeling badges */
+body.mobile-view .flex.flex-wrap.gap-2 {
+  gap: 4px;
+}
+
+body.mobile-view .flex.flex-wrap.gap-2 span {
+  font-size: 10px;
+  padding: 2px 6px;
+}
+
+/* ==========================================
+   MOBILE VIEW - KOMPAKTE FILTRE
+   ========================================== */
+
+body.mobile-view .p-4.bg-white.border-b {
+  padding: 8px;
+}
+
+body.mobile-view .relative.flex-1.max-w-xs {
+  max-width: 100%;
+}
+
+body.mobile-view select {
+  font-size: 13px;
+  padding: 8px 10px;
+}
+
+/* ==========================================
+   MOBILE VIEW - KOMPAKT HEADER INFO
+   ========================================== */
+
+body.mobile-view .grid-cols-2.gap-4 {
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+body.mobile-view .bg-gray-50.rounded-xl.p-4,
+body.mobile-view .bg-rose-50.rounded-xl.p-4 {
+  padding: 10px;
+}
+
+body.mobile-view .text-3xl {
+  font-size: 1.5rem;
+}
+
+/* ==========================================
+   MOBILE VIEW - SCROLL OMRÅDER
+   ========================================== */
+
+/* Horisontal scroll for overflow indhold */
+body.mobile-view .overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+body.mobile-view .overflow-x-auto::-webkit-scrollbar {
+  display: none;
+}
+
+/* ==========================================
+   MOBILE VIEW - KOMPAKT DETALJERET VISNING
+   ========================================== */
+
+body.mobile-view .flex.items-start.gap-4 {
+  flex-direction: column;
+  gap: 8px;
+}
+
+body.mobile-view .flex.items-start.gap-4 > .pt-1 {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+}
+
+body.mobile-view .flex.items-start.justify-between.gap-4 {
+  flex-direction: column;
+  gap: 8px;
+}
+
+body.mobile-view .flex.items-start.justify-between.gap-4 > .flex-1 {
+  width: 100%;
+}
+
+body.mobile-view .flex.items-start.justify-between.gap-4 > .text-right {
+  text-align: left;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Kompakt timevisning */
+body.mobile-view .inline-flex.items-center.gap-2.px-4.py-2 {
+  padding: 6px 10px;
+}
+
+body.mobile-view .inline-flex.items-center.gap-2.px-4.py-2 .text-xl {
+  font-size: 1rem;
+}
+
+/* Kompakt bevillingsstatus */
+body.mobile-view .flex-shrink-0.w-48 {
+  width: 100%;
+}
+
+/* Kompakt handlingsknapper */
+body.mobile-view .flex.gap-2.flex-shrink-0 {
+  width: 100%;
+  flex-direction: row;
+}
+
+body.mobile-view .flex.gap-2.flex-shrink-0 button {
+  flex: 1;
+  justify-content: center;
+  padding: 10px 8px;
+  font-size: 12px;
+}
+
+/* ==========================================
+   MOBILE VIEW - NAVIGATION TABS
+   ========================================== */
+
+body.mobile-view .border-b.border-gray-200.flex.bg-gray-50 {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+body.mobile-view .border-b.border-gray-200.flex.bg-gray-50 button {
+  white-space: nowrap;
+  padding: 10px 12px;
+  font-size: 12px;
+}
+
+/* ==========================================
+   MOBILE VIEW - BØRN OG BARNEPIGER LISTER
+   ========================================== */
+
+body.mobile-view .divide-y.divide-white\/20 > tr,
+body.mobile-view .divide-y.divide-gray-100 > tr {
+  background: white;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Tilpas avatar størrelse */
+body.mobile-view .w-10.h-10 {
+  width: 32px;
+  height: 32px;
+  font-size: 10px;
+}
+
+/* Badges kompakt */
+body.mobile-view .inline-flex.items-center.px-2\.5.py-1 {
+  padding: 2px 6px;
+  font-size: 10px;
+}
+
+body.mobile-view .inline-flex.items-center.px-2.py-0\.5 {
+  padding: 2px 4px;
+  font-size: 9px;
+}
+
+/* ==========================================
+   MOBILE VIEW - FORMULARER
+   ========================================== */
+
+body.mobile-view .space-y-5 {
+  gap: 12px;
+}
+
+body.mobile-view .grid.grid-cols-2.gap-4 {
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+body.mobile-view .glass-card-strong.rounded-2xl.p-6 {
+  padding: 12px;
+}
+
+/* ==========================================
+   MOBILE VIEW - MODAL
+   ========================================== */
+
+body.mobile-view .fixed.inset-0.bg-black\/50 {
+  padding: 8px;
+}
+
+body.mobile-view .fixed.inset-0 .rounded-2xl.shadow-2xl.p-6 {
+  padding: 12px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+body.mobile-view .fixed.inset-0 .w-12.h-12 {
+  width: 40px;
+  height: 40px;
+}
+
+body.mobile-view .fixed.inset-0 .text-xl {
+  font-size: 16px;
+}

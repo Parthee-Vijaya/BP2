@@ -47,15 +47,15 @@ export default function App() {
                 />
 
                 {/* Admin routes */}
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/admin/godkendelse" element={<ApprovalPage />} />
-                <Route path="/admin/boern" element={<ChildrenPage />} />
-                <Route path="/admin/barnepiger" element={<CaregiversPage />} />
+                <Route path="/admin" element={<AdminDashboard isMobileView={isMobileView} />} />
+                <Route path="/admin/godkendelse" element={<ApprovalPage isMobileView={isMobileView} />} />
+                <Route path="/admin/boern" element={<ChildrenPage isMobileView={isMobileView} />} />
+                <Route path="/admin/barnepiger" element={<CaregiversPage isMobileView={isMobileView} />} />
 
                 {/* Caregiver routes */}
-                <Route path="/barnepige" element={<CaregiverDashboard caregiverId={caregiverId} />} />
-                <Route path="/barnepige/registrer" element={<RegisterTime caregiverId={caregiverId} />} />
-                <Route path="/barnepige/mine-timer" element={<MyTimeEntries caregiverId={caregiverId} />} />
+                <Route path="/barnepige" element={<CaregiverDashboard caregiverId={caregiverId} isMobileView={isMobileView} />} />
+                <Route path="/barnepige/registrer" element={<RegisterTime caregiverId={caregiverId} isMobileView={isMobileView} />} />
+                <Route path="/barnepige/mine-timer" element={<MyTimeEntries caregiverId={caregiverId} isMobileView={isMobileView} />} />
 
                 {/* Catch all */}
                 <Route path="*" element={<Navigate to="/" replace />} />
