@@ -91,6 +91,13 @@ export default function RegisterTime({ caregiverId = 1 }) {
             return;
         }
 
+        // Tjek om dato er i fremtiden
+        const today = new Date().toISOString().split('T')[0];
+        if (formData.date > today) {
+            alert('Du kan ikke registrere timer for fremtidige datoer');
+            return;
+        }
+
         setSubmitting(true);
         try {
             await timeEntriesApi.create({
@@ -178,9 +185,11 @@ export default function RegisterTime({ caregiverId = 1 }) {
                             type="date"
                             value={formData.date}
                             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                            max={new Date().toISOString().split('T')[0]}
                             className="glass-input w-full rounded-xl px-4 py-3"
                             required
                         />
+                        <p className="mt-1.5 text-xs text-gray-400">Du kan ikke registrere timer for fremtidige datoer</p>
                     </div>
 
                     {/* Tid */}

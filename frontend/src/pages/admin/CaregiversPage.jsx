@@ -38,6 +38,20 @@ const CloseIcon = () => (
     </svg>
 );
 
+// MA-nummer validering - max 8 tal
+function validateMaNumber(value) {
+    if (!value) return { valid: false, error: 'MA-nummer er påkrævet' };
+    const cleaned = value.replace(/\D/g, ''); // Kun tal
+    if (cleaned.length === 0) return { valid: false, error: 'MA-nummer skal indeholde tal' };
+    if (cleaned.length > 8) return { valid: false, error: 'MA-nummer må max være 8 cifre' };
+    return { valid: true, error: '' };
+}
+
+function formatMaNumber(value) {
+    // Fjern alt undtagen tal og begræns til 8 cifre
+    return value.replace(/\D/g, '').slice(0, 8);
+}
+
 export default function CaregiversPage() {
     const [caregivers, setCaregivers] = useState([]);
     const [children, setChildren] = useState([]);
@@ -45,6 +59,7 @@ export default function CaregiversPage() {
     const [editModal, setEditModal] = useState({ open: false, caregiver: null });
     const [formData, setFormData] = useState({});
     const [searchQuery, setSearchQuery] = useState('');
+    const [maError, setMaError] = useState('');
 
     useEffect(() => {
         loadData();
@@ -72,6 +87,7 @@ export default function CaregiversPage() {
             ma_number: '',
             child_ids: []
         });
+        setMaError('');
         setEditModal({ open: true, caregiver: null });
     }
 
@@ -82,10 +98,18 @@ export default function CaregiversPage() {
             ma_number: caregiver.ma_number,
             child_ids: caregiver.children?.map(c => c.id) || []
         });
+        setMaError('');
         setEditModal({ open: true, caregiver });
     }
 
     async function handleSave() {
+        // Valider MA-nummer
+        const maValidation = validateMaNumber(formData.ma_number);
+        if (!maValidation.valid) {
+            setMaError(maValidation.error);
+            return;
+        }
+
         try {
             if (editModal.caregiver) {
                 await caregiversApi.update(editModal.caregiver.id, formData);
@@ -295,13 +319,26 @@ export default function CaregiversPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">MA-nummer *</label>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">MA-nummer * (max 8 cifre)</label>
                                 <input
                                     type="text"
                                     value={formData.ma_number}
-                                    onChange={(e) => setFormData({ ...formData, ma_number: e.target.value })}
-                                    className="glass-input w-full rounded-xl px-4 py-2.5"
+                                    onChange={(e) => {
+                                        const formatted = formatMaNumber(e.target.value);
+                                        setFormData({ ...formData, ma_number: formatted });
+                                        const validation = validateMaNumber(formatted);
+                                        setMaError(validation.valid ? '' : validation.error);
+                                    }}
+                                    placeholder="12345678"
+                                    maxLength={8}
+                                    className={`glass-input w-full rounded-xl px-4 py-2.5 ${
+                                        maError ? 'border-red-400 focus:border-red-500' : ''
+                                    }`}
                                 />
+                                {maError && (
+                                    <p className="mt-1.5 text-xs text-red-600 font-medium">{maError}</p>
+                                )}
+                                <p className="mt-1.5 text-xs text-gray-400">Kun tal, max 8 cifre</p>
                             </div>
 
                             <div>

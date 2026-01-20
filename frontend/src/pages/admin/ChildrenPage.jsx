@@ -429,7 +429,78 @@ export default function ChildrenPage() {
                                 </div>
                             </div>
 
-                            {/* Rammebevilling toggle */}
+                            {/* Normal bevilling */}
+                            <div className="p-4 bg-white/30 rounded-xl border border-white/30 backdrop-blur-sm">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Bevillingstype</label>
+                                <select
+                                    value={formData.grant_type}
+                                    onChange={(e) => setFormData({ ...formData, grant_type: e.target.value })}
+                                    className="glass-input w-full rounded-xl px-4 py-2.5 mb-4"
+                                >
+                                    <option value="week">Uge</option>
+                                    <option value="month">Måned</option>
+                                    <option value="quarter">Kvartal</option>
+                                    <option value="half_year">Halvår</option>
+                                    <option value="year">År</option>
+                                    <option value="specific_weekdays">Specifikke ugedage</option>
+                                </select>
+
+                                {formData.grant_type === 'specific_weekdays' ? (
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-3">Timer pr. ugedag</label>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            {weekdays.map((day) => (
+                                                <div key={day} className="flex items-center gap-2 p-2.5 bg-white/50 rounded-lg border border-white/30">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={(formData.grant_weekdays?.[day] || 0) > 0}
+                                                        onChange={(e) => {
+                                                            const weekdays = { ...formData.grant_weekdays };
+                                                            if (e.target.checked) {
+                                                                weekdays[day] = weekdays[day] || 2;
+                                                            } else {
+                                                                weekdays[day] = 0;
+                                                            }
+                                                            setFormData({ ...formData, grant_weekdays: weekdays });
+                                                        }}
+                                                        className="rounded border-gray-300 text-[#B54A32] focus:ring-[#B54A32]"
+                                                    />
+                                                    <span className="w-16 text-sm font-medium text-gray-700">{translateWeekday(day)}:</span>
+                                                    <input
+                                                        type="number"
+                                                        value={formData.grant_weekdays?.[day] || 0}
+                                                        onChange={(e) => {
+                                                            const weekdays = { ...formData.grant_weekdays };
+                                                            weekdays[day] = parseFloat(e.target.value) || 0;
+                                                            setFormData({ ...formData, grant_weekdays: weekdays });
+                                                        }}
+                                                        className="w-16 glass-input rounded-lg px-2 py-1 text-sm"
+                                                        min="0"
+                                                        step="0.5"
+                                                    />
+                                                    <span className="text-xs text-gray-400">timer</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                            Bevilling (timer pr. {translateGrantType(formData.grant_type).toLowerCase()})
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={formData.grant_hours}
+                                            onChange={(e) => setFormData({ ...formData, grant_hours: parseFloat(e.target.value) || 0 })}
+                                            className="glass-input w-full rounded-xl px-4 py-2.5"
+                                            min="0"
+                                            step="0.5"
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Rammebevilling - separat sektion */}
                             <div className="p-4 bg-purple-500/10 rounded-xl border border-purple-500/20 backdrop-blur-sm">
                                 <label className="flex items-center gap-3 cursor-pointer">
                                     <input
@@ -438,7 +509,10 @@ export default function ChildrenPage() {
                                         onChange={(e) => setFormData({ ...formData, has_frame_grant: e.target.checked })}
                                         className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                                     />
-                                    <span className="font-semibold text-purple-700">Brug rammebevilling</span>
+                                    <div>
+                                        <span className="font-semibold text-purple-700">Rammebevilling</span>
+                                        <p className="text-xs text-purple-600/70 mt-0.5">Årlig ramme ud over normal bevillingstype</p>
+                                    </div>
                                 </label>
                                 {formData.has_frame_grant && (
                                     <div className="mt-4">
@@ -451,82 +525,10 @@ export default function ChildrenPage() {
                                             min="0"
                                             step="0.5"
                                         />
+                                        <p className="text-xs text-purple-600/70 mt-2">Rammebevilling overruler den normale bevillingstype når aktiveret</p>
                                     </div>
                                 )}
                             </div>
-
-                            {/* Normal bevilling (kun hvis ikke rammebevilling) */}
-                            {!formData.has_frame_grant && (
-                                <div className="p-4 bg-white/30 rounded-xl border border-white/30 backdrop-blur-sm">
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Bevillingstype</label>
-                                    <select
-                                        value={formData.grant_type}
-                                        onChange={(e) => setFormData({ ...formData, grant_type: e.target.value })}
-                                        className="glass-input w-full rounded-xl px-4 py-2.5 mb-4"
-                                    >
-                                        <option value="week">Uge</option>
-                                        <option value="month">Måned</option>
-                                        <option value="quarter">Kvartal</option>
-                                        <option value="half_year">Halvår</option>
-                                        <option value="year">År</option>
-                                        <option value="specific_weekdays">Specifikke ugedage</option>
-                                    </select>
-
-                                    {formData.grant_type === 'specific_weekdays' ? (
-                                        <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-3">Timer pr. ugedag</label>
-                                            <div className="grid grid-cols-2 gap-2">
-                                                {weekdays.map((day) => (
-                                                    <div key={day} className="flex items-center gap-2 p-2.5 bg-white/50 rounded-lg border border-white/30">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={(formData.grant_weekdays?.[day] || 0) > 0}
-                                                            onChange={(e) => {
-                                                                const weekdays = { ...formData.grant_weekdays };
-                                                                if (e.target.checked) {
-                                                                    weekdays[day] = weekdays[day] || 2;
-                                                                } else {
-                                                                    weekdays[day] = 0;
-                                                                }
-                                                                setFormData({ ...formData, grant_weekdays: weekdays });
-                                                            }}
-                                                            className="rounded border-gray-300 text-[#B54A32] focus:ring-[#B54A32]"
-                                                        />
-                                                        <span className="w-16 text-sm font-medium text-gray-700">{translateWeekday(day)}:</span>
-                                                        <input
-                                                            type="number"
-                                                            value={formData.grant_weekdays?.[day] || 0}
-                                                            onChange={(e) => {
-                                                                const weekdays = { ...formData.grant_weekdays };
-                                                                weekdays[day] = parseFloat(e.target.value) || 0;
-                                                                setFormData({ ...formData, grant_weekdays: weekdays });
-                                                            }}
-                                                            className="w-16 glass-input rounded-lg px-2 py-1 text-sm"
-                                                            min="0"
-                                                            step="0.5"
-                                                        />
-                                                        <span className="text-xs text-gray-400">timer</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                                Bevilling (timer pr. {translateGrantType(formData.grant_type).toLowerCase()})
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={formData.grant_hours}
-                                                onChange={(e) => setFormData({ ...formData, grant_hours: parseFloat(e.target.value) || 0 })}
-                                                className="glass-input w-full rounded-xl px-4 py-2.5"
-                                                min="0"
-                                                step="0.5"
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                            )}
                         </div>
 
                         <div className="flex gap-3 mt-6 pt-5 border-t border-white/20">
