@@ -475,9 +475,6 @@ export default function ApprovalPage() {
                                             />
                                         </th>
                                     )}
-                                    {activeTab === 'pending' && (
-                                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-                                    )}
                                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Barnepige</th>
                                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Barn</th>
                                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Dato</th>
@@ -512,16 +509,6 @@ export default function ApprovalPage() {
                                                         onChange={() => toggleSelect(entry.id)}
                                                         className="rounded border-gray-300 text-[#B54A32] focus:ring-[#B54A32]"
                                                     />
-                                                </td>
-                                            )}
-                                            {activeTab === 'pending' && (
-                                                <td className="px-4 py-3">
-                                                    {isExceeded && (
-                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-rose-500 text-white text-xs font-bold rounded-full">
-                                                            <WarningIcon className="w-3 h-3" />
-                                                            OVER
-                                                        </span>
-                                                    )}
                                                 </td>
                                             )}
                                             <td className="px-4 py-3">
@@ -634,10 +621,6 @@ export default function ApprovalPage() {
                                             }
                                         `}
                                     >
-                                        {/* Status indicator stripe - kun ved pending og overskridelse */}
-                                        {activeTab === 'pending' && isExceeded && (
-                                            <div className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-xl bg-rose-500" />
-                                        )}
 
                                         <div className="p-4 pl-6">
                                             <div className="flex items-start gap-4">
@@ -658,14 +641,6 @@ export default function ApprovalPage() {
                                                     <div className="flex items-start justify-between gap-4">
                                                         {/* Left side - People info */}
                                                         <div className="flex-1">
-                                                            {activeTab === 'pending' && isExceeded && (
-                                                                <div className="flex items-center gap-3 mb-2">
-                                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-rose-500 text-white text-xs font-bold rounded-full">
-                                                                        <WarningIcon className="w-3 h-3" />
-                                                                        OVERSKREDET
-                                                                    </span>
-                                                                </div>
-                                                            )}
 
                                                             <div className="grid grid-cols-2 gap-4">
                                                                 {/* Barnepige */}
