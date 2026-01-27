@@ -240,12 +240,29 @@ export default function RegisterTime({ caregiverId = 1 }) {
                         <input
                             type="date"
                             value={formData.date}
-                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                            onChange={(e) => {
+                                const selected = e.target.value;
+                                const today = new Date().toISOString().split('T')[0];
+                                if (selected > today) {
+                                    setFormData({ ...formData, date: '', _futureDateError: true });
+                                } else {
+                                    setFormData({ ...formData, date: selected, _futureDateError: false });
+                                }
+                            }}
                             max={new Date().toISOString().split('T')[0]}
-                            className="glass-input w-full rounded-xl px-4 py-3"
+                            className={`glass-input w-full rounded-xl px-4 py-3 ${formData._futureDateError ? 'border-rose-400 ring-2 ring-rose-200' : ''}`}
                             required
                         />
-                        <p className="mt-1.5 text-xs text-gray-400">Du kan ikke registrere timer for fremtidige datoer</p>
+                        {formData._futureDateError ? (
+                            <div className="mt-2 p-3 bg-rose-50 border border-rose-300 rounded-xl text-rose-700 text-sm font-medium flex items-center gap-2">
+                                <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                </svg>
+                                Du kan ikke registrere timer for fremtidige datoer. Vælg dags dato eller tidligere.
+                            </div>
+                        ) : (
+                            <p className="mt-1.5 text-xs text-gray-400">Du kan ikke registrere timer for fremtidige datoer</p>
+                        )}
                     </div>
 
                     {/* Tid */}
