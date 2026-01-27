@@ -192,7 +192,7 @@ export default function RegisterTime({ caregiverId = 1 }) {
                     </div>
 
                     {/* Bevillingstype valg - vises kun hvis barnet har rammebevilling */}
-                    {selectedChild?.has_frame_grant && (
+                    {!!selectedChild?.has_frame_grant && (
                         <div className="p-4 bg-purple-50 rounded-xl border border-purple-200">
                             <label className="block text-sm font-semibold text-gray-700 mb-3">Vælg bevillingstype *</label>
                             <div className="space-y-3">
@@ -357,6 +357,9 @@ export default function RegisterTime({ caregiverId = 1 }) {
                                             <div>Forbrugt: {formatHours(preview.grantStatus.usedHours)} / {formatHours(preview.grantStatus.grantHours)} timer</div>
                                             <div>Efter registrering: {formatHours(preview.grantStatus.totalAfterNew)} timer</div>
                                             <div className="font-semibold">Overskredet med: {formatHours(preview.grantStatus.exceededBy)} timer</div>
+                                            <div className="mt-2 p-2 bg-rose-50 border border-rose-200 rounded text-rose-800 text-xs">
+                                                Det indtastede antal timer overskrider bevillingen. Det er godkender/leders opgave at sikre at det kan godkendes.
+                                            </div>
                                         </div>
                                     </div>
                                 ) : (

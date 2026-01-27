@@ -5,6 +5,7 @@ import childrenRouter from './routes/children.js';
 import caregiversRouter from './routes/caregivers.js';
 import timeEntriesRouter from './routes/timeEntries.js';
 import exportRouter from './routes/export.js';
+import settingsRouter from './routes/settings.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -27,6 +28,7 @@ app.use('/api/children', childrenRouter);
 app.use('/api/caregivers', caregiversRouter);
 app.use('/api/time-entries', timeEntriesRouter);
 app.use('/api/export', exportRouter);
+app.use('/api/settings', settingsRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {

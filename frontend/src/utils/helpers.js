@@ -70,10 +70,10 @@ export function getGrantStatusColor(percentage) {
     return 'green';
 }
 
-// Formater timer i time:minut format (f.eks. 1:45)
+// Formater timer i decimalformat (0,25 = 15 min, 0,50 = 30 min, 0,75 = 45 min, 1,00 = 1 time)
 export function formatHours(hours) {
     const h = hours || 0;
-    const wholeHours = Math.floor(h);
-    const minutes = Math.round((h - wholeHours) * 60);
-    return `${wholeHours}:${String(minutes).padStart(2, '0')}`;
+    // Rund til nærmeste 0,25
+    const rounded = Math.round(h * 4) / 4;
+    return rounded.toFixed(2).replace('.', ',');
 }

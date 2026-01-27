@@ -26,8 +26,12 @@ function getDanishHolidays(year) {
 
     // Faste helligdage
     holidays.push(`${year}-01-01`); // Nytårsdag
+    holidays.push(`${year}-05-01`); // 1. maj (behandles som helligdag)
+    holidays.push(`${year}-06-05`); // Grundlovsdag (5. juni - behandles som helligdag)
+    holidays.push(`${year}-12-24`); // Juleaftensdag (behandles som helligdag)
     holidays.push(`${year}-12-25`); // Juledag
     holidays.push(`${year}-12-26`); // 2. Juledag
+    holidays.push(`${year}-12-31`); // Nytårsaftensdag (behandles som helligdag)
 
     // Påskebaserede helligdage (beregnes ud fra påskedag)
     const easterDate = calculateEasterDate(year);
@@ -182,73 +186,55 @@ export function calculateAllowances(dateStr, startTime, endTime) {
         total_hours: 0
     };
 
-    // Søndage (0) eller helligdage - ALT er søndagstillæg
+    // ALLE timer registreres som normaltimer (total_hours = normal_hours)
+    // Tillæg beregnes OVENI som ekstra (ikke i stedet for)
+    const totalHours = totalMinutes / 60;
+    result.normal_hours = totalHours;
+    result.total_hours = totalHours;
+
+    // Søndage (0) eller helligdage - søndags/helligdagstillæg på alle timer
     if (dayOfWeek === 0 || holiday) {
-        result.sunday_holiday_hours = totalMinutes / 60;
-        result.total_hours = totalMinutes / 60;
+        result.sunday_holiday_hours = totalHours;
         return roundResult(result);
     }
 
     // Lørdage (6)
     if (dayOfWeek === 6) {
-        // 00:00-06:00 (0-360): Nattillæg
-        // 06:01-08:00 (361-480): Normaltimer
-        // 08:01-23:59 (481-1439): Lørdagstillæg
-
         // Nattillæg: 00:00-06:00
         const nightMinutes1 = calculateOverlap(startMinutes, Math.min(endMinutes, 24 * 60), 0, 360);
 
-        // Normaltimer: 06:01-08:00
-        const normalMinutes = calculateOverlap(startMinutes, Math.min(endMinutes, 24 * 60), 361, 480);
+        // Lørdagstillæg: 08:00-23:59
+        const saturdayMinutes = calculateOverlap(startMinutes, Math.min(endMinutes, 24 * 60), 480, 1440);
 
-        // Lørdagstillæg: 08:01-23:59
-        const saturdayMinutes = calculateOverlap(startMinutes, Math.min(endMinutes, 24 * 60), 481, 1440);
-
-        // Nattillæg næste dag (hvis midnat-overgang)
-        let nightMinutes2 = 0;
+        // Timer efter midnat (på søndag = søndagstillæg)
         if (endMinutes > 24 * 60) {
-            // Timer efter midnat (på søndag = søndagstillæg)
             result.sunday_holiday_hours = (endMinutes - 24 * 60) / 60;
         }
 
         result.night_hours = nightMinutes1 / 60;
-        result.normal_hours = normalMinutes / 60;
         result.saturday_hours = saturdayMinutes / 60;
-        result.total_hours = (nightMinutes1 + normalMinutes + saturdayMinutes) / 60 + result.sunday_holiday_hours;
 
         return roundResult(result);
     }
 
     // Hverdage (mandag-fredag, 1-5)
-    // 00:00-06:00 (0-360): Nattillæg
-    // 06:01-17:00 (361-1020): Normaltimer
-    // 17:01-23:00 (1021-1380): Aftentillæg
-    // 23:00-23:59 (1380-1439): Nattillæg
-
     // Nattillæg morgen: 00:00-06:00
     const nightMorning = calculateOverlap(startMinutes, Math.min(endMinutes, 24 * 60), 0, 360);
 
-    // Normaltimer: 06:01-17:00
-    const normalMinutes = calculateOverlap(startMinutes, Math.min(endMinutes, 24 * 60), 361, 1020);
-
-    // Aftentillæg: 17:01-23:00
-    const eveningMinutes = calculateOverlap(startMinutes, Math.min(endMinutes, 24 * 60), 1021, 1380);
+    // Aftentillæg: 17:00-23:00
+    const eveningMinutes = calculateOverlap(startMinutes, Math.min(endMinutes, 24 * 60), 1020, 1380);
 
     // Nattillæg aften: 23:00-23:59
     const nightEvening = calculateOverlap(startMinutes, Math.min(endMinutes, 24 * 60), 1380, 1440);
 
-    // Timer efter midnat (næste dag) - afhænger af hvilken dag
+    // Timer efter midnat (næste dag)
     let nightAfterMidnight = 0;
     if (endMinutes > 24 * 60) {
-        // Timer fra midnat til sluttid næste dag
-        nightAfterMidnight = Math.min(endMinutes - 24 * 60, 360); // Max til kl 06:00
-        // Resten efter 06:00 ville være normaltimer, men det håndteres som ny dag
+        nightAfterMidnight = Math.min(endMinutes - 24 * 60, 360);
     }
 
     result.night_hours = (nightMorning + nightEvening + nightAfterMidnight) / 60;
-    result.normal_hours = normalMinutes / 60;
     result.evening_hours = eveningMinutes / 60;
-    result.total_hours = (nightMorning + normalMinutes + eveningMinutes + nightEvening + nightAfterMidnight) / 60;
 
     return roundResult(result);
 }

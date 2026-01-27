@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { timeEntriesApi, childrenApi, caregiversApi, exportApi } from '../../utils/api';
+import { timeEntriesApi, childrenApi, caregiversApi, exportApi, settingsApi } from '../../utils/api';
 import { formatHours } from '../../utils/helpers';
 
 // Icons
@@ -69,8 +69,15 @@ const CardIcon = () => (
     </svg>
 );
 
+const SettingsIcon = () => (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+);
+
 const SortIcon = ({ direction }) => (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         {direction === 'asc' ? (
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
         ) : direction === 'desc' ? (
@@ -95,6 +102,22 @@ function getDayName(dateString) {
     return date.toLocaleDateString('da-DK', { weekday: 'short' });
 }
 
+// Sorterbar kolonneheader
+function SortableHeader({ label, sortKey, currentSort, onSort, className = '' }) {
+    const isActive = currentSort.key === sortKey;
+    return (
+        <th
+            className={`px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none transition-colors ${className}`}
+            onClick={() => onSort(sortKey)}
+        >
+            <div className="flex items-center gap-1">
+                {label}
+                {isActive && <SortIcon direction={currentSort.direction} />}
+            </div>
+        </th>
+    );
+}
+
 export default function ApprovalPage({ isMobileView = false }) {
     const [activeTab, setActiveTab] = useState('pending');
     const [entries, setEntries] = useState([]);
@@ -111,14 +134,61 @@ export default function ApprovalPage({ isMobileView = false }) {
     const [rejectReason, setRejectReason] = useState('');
     const [viewReasonModal, setViewReasonModal] = useState({ open: false, reason: '', entry: null });
     const [isCompactView, setIsCompactView] = useState(false);
-    const [sortDirection, setSortDirection] = useState('desc'); // 'asc' or 'desc' for date sorting
+
+    // Sorterings-state: key + direction
+    const [sortConfig, setSortConfig] = useState({ key: 'caregiver_name', direction: 'asc' });
+
+    // Periode-søgning for godkendte indberetninger
+    const [approvedFromDate, setApprovedFromDate] = useState('');
+    const [approvedToDate, setApprovedToDate] = useState('');
+
+    // Månedsinterval indstillinger
+    const [monthInterval, setMonthInterval] = useState({ start_day: 1, end_day: 31 });
+    const [showMonthIntervalModal, setShowMonthIntervalModal] = useState(false);
+    const [newMonthInterval, setNewMonthInterval] = useState({ start_day: 1, end_day: 31 });
 
     // Automatisk kompakt visning på mobil
     const effectiveCompactView = isMobileView || isCompactView;
 
+    // Sæt default sortering baseret på aktiv tab
+    useEffect(() => {
+        if (activeTab === 'pending') {
+            setSortConfig({ key: 'caregiver_name', direction: 'asc' });
+        } else if (activeTab === 'approved') {
+            setSortConfig({ key: 'child_name', direction: 'asc' });
+        } else if (activeTab === 'rejected') {
+            setSortConfig({ key: 'caregiver_name', direction: 'asc' });
+        }
+    }, [activeTab]);
+
     useEffect(() => {
         loadData();
-    }, [activeTab, selectedChild, selectedCaregiver]);
+    }, [activeTab, selectedChild, selectedCaregiver, approvedFromDate, approvedToDate]);
+
+    useEffect(() => {
+        loadMonthInterval();
+    }, []);
+
+    async function loadMonthInterval() {
+        try {
+            const data = await settingsApi.getMonthInterval();
+            setMonthInterval(data);
+            setNewMonthInterval({ start_day: data.start_day, end_day: data.end_day });
+        } catch (error) {
+            console.error('Fejl ved hentning af månedsinterval:', error);
+        }
+    }
+
+    async function handleSaveMonthInterval() {
+        try {
+            await settingsApi.updateMonthInterval(newMonthInterval.start_day, newMonthInterval.end_day);
+            setShowMonthIntervalModal(false);
+            loadMonthInterval();
+            alert(`Månedsinterval ændret til d. ${newMonthInterval.start_day} - d. ${newMonthInterval.end_day}.\nGælder fra i dag og frem.`);
+        } catch (error) {
+            alert('Fejl: ' + error.message);
+        }
+    }
 
     async function loadData() {
         setLoading(true);
@@ -129,6 +199,13 @@ export default function ApprovalPage({ isMobileView = false }) {
             }
             if (selectedCaregiver !== 'all') {
                 params.caregiver_id = selectedCaregiver;
+            }
+            // Periode-søgning for godkendte
+            if (activeTab === 'approved' && approvedFromDate) {
+                params.from_date = approvedFromDate;
+            }
+            if (activeTab === 'approved' && approvedToDate) {
+                params.to_date = approvedToDate;
             }
 
             const [entriesData, childrenData, caregiversData] = await Promise.all([
@@ -169,6 +246,33 @@ export default function ApprovalPage({ isMobileView = false }) {
         }
     }
 
+    // Sorteringsfunktion
+    function handleSort(key) {
+        setSortConfig(prev => ({
+            key,
+            direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+        }));
+    }
+
+    function getSortValue(entry, key) {
+        switch (key) {
+            case 'caregiver_name':
+                return `${entry.caregiver_first_name} ${entry.caregiver_last_name}`.toLowerCase();
+            case 'child_name':
+                return `${entry.child_first_name} ${entry.child_last_name}`.toLowerCase();
+            case 'date':
+                return entry.date;
+            case 'time':
+                return entry.start_time;
+            case 'total_hours':
+                return entry.total_hours;
+            case 'ma_number':
+                return entry.ma_number || '';
+            default:
+                return '';
+        }
+    }
+
     const filteredEntries = entries
         .filter(entry => {
             if (!searchQuery) return true;
@@ -179,14 +283,12 @@ export default function ApprovalPage({ isMobileView = false }) {
             return caregiverName.includes(query) || childName.includes(query) || maNumber.includes(query);
         })
         .sort((a, b) => {
-            const dateA = new Date(a.date);
-            const dateB = new Date(b.date);
-            return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+            const aVal = getSortValue(a, sortConfig.key);
+            const bVal = getSortValue(b, sortConfig.key);
+            const direction = sortConfig.direction === 'asc' ? 1 : -1;
+            if (typeof aVal === 'number') return (aVal - bVal) * direction;
+            return aVal.localeCompare(bVal, 'da') * direction;
         });
-
-    function toggleSortDirection() {
-        setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
-    }
 
     async function handleApprove(id) {
         try {
@@ -321,6 +423,18 @@ export default function ApprovalPage({ isMobileView = false }) {
                         <p className="text-gray-500 mt-1">Gennemgå og godkend timeregistreringer fra barnepiger</p>
                     </div>
                     <div className="flex items-center gap-3">
+                        {/* Månedsinterval indstilling */}
+                        <button
+                            onClick={() => setShowMonthIntervalModal(true)}
+                            className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all font-medium text-sm"
+                            title="Indstil månedsinterval"
+                        >
+                            <SettingsIcon />
+                            <span className="hidden sm:inline">
+                                Periode: d. {monthInterval.start_day} - d. {monthInterval.end_day}
+                            </span>
+                        </button>
+
                         {/* View toggle */}
                         <div className="flex bg-gray-100 rounded-xl p-1 border border-gray-200">
                             <button
@@ -443,16 +557,37 @@ export default function ApprovalPage({ isMobileView = false }) {
                             ))}
                         </select>
 
-                        {/* Sort by date button */}
-                        <button
-                            onClick={toggleSortDirection}
-                            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm hover:bg-gray-50 transition-all"
-                            title={`Sortér efter dato (${sortDirection === 'asc' ? 'ældste først' : 'nyeste først'})`}
-                        >
-                            <CalendarIcon />
-                            <span className="hidden sm:inline">Dato</span>
-                            <SortIcon direction={sortDirection} />
-                        </button>
+                        {/* Periode-søgning for godkendte */}
+                        {activeTab === 'approved' && (
+                            <>
+                                <div className="flex items-center gap-2">
+                                    <label className="text-xs text-gray-500 font-medium">Fra:</label>
+                                    <input
+                                        type="date"
+                                        value={approvedFromDate}
+                                        onChange={(e) => setApprovedFromDate(e.target.value)}
+                                        className="px-3 py-2 bg-white border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[#B54A32]/20"
+                                    />
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <label className="text-xs text-gray-500 font-medium">Til:</label>
+                                    <input
+                                        type="date"
+                                        value={approvedToDate}
+                                        onChange={(e) => setApprovedToDate(e.target.value)}
+                                        className="px-3 py-2 bg-white border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[#B54A32]/20"
+                                    />
+                                </div>
+                                {(approvedFromDate || approvedToDate) && (
+                                    <button
+                                        onClick={() => { setApprovedFromDate(''); setApprovedToDate(''); }}
+                                        className="text-xs text-gray-500 hover:text-[#B54A32] font-medium underline"
+                                    >
+                                        Nulstil
+                                    </button>
+                                )}
+                            </>
+                        )}
 
                         {activeTab === 'pending' && filteredEntries.length > 0 && (
                             <div className="flex items-center gap-3 ml-auto">
@@ -512,11 +647,11 @@ export default function ApprovalPage({ isMobileView = false }) {
                                             />
                                         </th>
                                     )}
-                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Barnepige</th>
-                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Barn</th>
-                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Dato</th>
-                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tid</th>
-                                    <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Timer</th>
+                                    <SortableHeader label="Barnepige" sortKey="caregiver_name" currentSort={sortConfig} onSort={handleSort} className="text-left" />
+                                    <SortableHeader label="Barn" sortKey="child_name" currentSort={sortConfig} onSort={handleSort} className="text-left" />
+                                    <SortableHeader label="Dato" sortKey="date" currentSort={sortConfig} onSort={handleSort} className="text-left" />
+                                    <SortableHeader label="Tid" sortKey="time" currentSort={sortConfig} onSort={handleSort} className="text-left" />
+                                    <SortableHeader label="Timer" sortKey="total_hours" currentSort={sortConfig} onSort={handleSort} className="text-right" />
                                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Bevilling</th>
                                     <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Handlinger</th>
                                 </tr>
@@ -576,6 +711,9 @@ export default function ApprovalPage({ isMobileView = false }) {
                                                             isExceeded ? 'text-rose-600' : isWarning ? 'text-amber-600' : 'text-gray-600'
                                                         }`}>
                                                             {formatHours(grantStatus.usedHours)}/{formatHours(grantStatus.grantHours)}
+                                                            {isExceeded && (
+                                                                <span className="ml-1" title="Det indtastede antal timer overskrider bevillingen. Det er godkender/leders opgave at sikre at det kan godkendes.">⚠️</span>
+                                                            )}
                                                         </div>
                                                         <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
                                                             <div
@@ -639,6 +777,30 @@ export default function ApprovalPage({ isMobileView = false }) {
                 ) : (
                     /* DETAILED CARD VIEW */
                     <div className="p-4">
+                        {/* Sorteringsbar for detaljeret visning */}
+                        <div className="flex items-center gap-2 mb-4 text-xs text-gray-500">
+                            <span className="font-medium">Sortér:</span>
+                            {[
+                                { key: 'caregiver_name', label: 'Barnepige' },
+                                { key: 'child_name', label: 'Barn' },
+                                { key: 'date', label: 'Dato' },
+                                { key: 'total_hours', label: 'Timer' },
+                            ].map(item => (
+                                <button
+                                    key={item.key}
+                                    onClick={() => handleSort(item.key)}
+                                    className={`px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1 ${
+                                        sortConfig.key === item.key
+                                            ? 'bg-[#B54A32]/10 border-[#B54A32]/30 text-[#B54A32] font-semibold'
+                                            : 'bg-white border-gray-200 hover:border-gray-300 text-gray-600'
+                                    }`}
+                                >
+                                    {item.label}
+                                    {sortConfig.key === item.key && <SortIcon direction={sortConfig.direction} />}
+                                </button>
+                            ))}
+                        </div>
+
                         <div className="grid gap-3">
                             {filteredEntries.map((entry) => {
                                 const grantStatus = getGrantStatus(entry.child_id);
@@ -658,6 +820,15 @@ export default function ApprovalPage({ isMobileView = false }) {
                                             }
                                         `}
                                     >
+                                        {/* Bevilling overskredet notifikation */}
+                                        {isExceeded && (
+                                            <div className="px-6 py-2 bg-rose-100 border-b border-rose-200 rounded-t-xl">
+                                                <div className="flex items-center gap-2 text-rose-700 text-xs font-medium">
+                                                    <WarningIcon />
+                                                    Det indtastede antal timer overskrider bevillingen. Det er godkender/leders opgave at sikre at det kan godkendes.
+                                                </div>
+                                            </div>
+                                        )}
 
                                         <div className="p-4 pl-6">
                                             <div className="flex items-start gap-4">
@@ -914,6 +1085,96 @@ export default function ApprovalPage({ isMobileView = false }) {
                         >
                             Luk
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Månedsinterval Modal */}
+            {showMonthIntervalModal && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+                    <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md animate-scale-in">
+                        <div className="flex items-center gap-3 mb-5">
+                            <div className="w-12 h-12 bg-gradient-to-br from-[#B54A32] to-[#9a3f2b] rounded-xl flex items-center justify-center text-white shadow-lg shadow-[#B54A32]/30">
+                                <SettingsIcon />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-gray-900">Månedsinterval</h3>
+                                <p className="text-sm text-gray-500">Indstil perioden for månedlige indberetninger</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5">
+                            <div className="flex items-start gap-2 text-amber-700 text-sm">
+                                <WarningIcon />
+                                <div>
+                                    <div className="font-semibold">Bemærk</div>
+                                    <div>Ændringer gælder fra d.d. og frem. Tidligere perioder påvirkes ikke.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Nuværende interval */}
+                        <div className="bg-gray-50 rounded-xl p-4 mb-5 border border-gray-200">
+                            <div className="text-xs text-gray-500 font-medium mb-1">Nuværende interval</div>
+                            <div className="text-lg font-bold text-gray-900">
+                                d. {monthInterval.start_day} - d. {monthInterval.end_day}
+                            </div>
+                            {monthInterval.effective_from && (
+                                <div className="text-xs text-gray-500 mt-1">Gældende fra {monthInterval.effective_from}</div>
+                            )}
+                            {monthInterval.is_default && (
+                                <div className="text-xs text-gray-400 mt-1">Standard (1. til sidste dag i md.)</div>
+                            )}
+                        </div>
+
+                        {/* Nyt interval */}
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Første dag i perioden</label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max="31"
+                                        value={newMonthInterval.start_day}
+                                        onChange={(e) => setNewMonthInterval({ ...newMonthInterval, start_day: parseInt(e.target.value) || 1 })}
+                                        className="w-full border border-gray-300 rounded-xl px-4 py-3 text-lg font-bold text-center focus:ring-2 focus:ring-[#B54A32]/20 focus:border-[#B54A32]/30"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Sidste dag i perioden</label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max="31"
+                                        value={newMonthInterval.end_day}
+                                        onChange={(e) => setNewMonthInterval({ ...newMonthInterval, end_day: parseInt(e.target.value) || 31 })}
+                                        className="w-full border border-gray-300 rounded-xl px-4 py-3 text-lg font-bold text-center focus:ring-2 focus:ring-[#B54A32]/20 focus:border-[#B54A32]/30"
+                                    />
+                                </div>
+                            </div>
+                            <div className="text-sm text-gray-500">
+                                Eksempel: d. {newMonthInterval.start_day} til d. {newMonthInterval.end_day} i hver måned
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3 mt-6">
+                            <button
+                                onClick={handleSaveMonthInterval}
+                                className="flex-1 px-5 py-3 btn-kalundborg rounded-xl font-semibold"
+                            >
+                                Gem ændring
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setShowMonthIntervalModal(false);
+                                    setNewMonthInterval({ start_day: monthInterval.start_day, end_day: monthInterval.end_day });
+                                }}
+                                className="flex-1 px-5 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 font-medium transition-all"
+                            >
+                                Annuller
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

@@ -59,6 +59,16 @@ export const timeEntriesApi = {
     })
 };
 
+// Settings API
+export const settingsApi = {
+    getMonthInterval: () => fetchApi('/settings/month-interval'),
+    getMonthIntervalHistory: () => fetchApi('/settings/month-interval/history'),
+    updateMonthInterval: (startDay, endDay) => fetchApi('/settings/month-interval', {
+        method: 'PUT',
+        body: JSON.stringify({ start_day: startDay, end_day: endDay })
+    })
+};
+
 // Export API
 export const exportApi = {
     timeEntries: (params = {}) => {

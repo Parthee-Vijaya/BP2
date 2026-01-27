@@ -86,6 +86,23 @@ CREATE TABLE IF NOT EXISTS time_entries (
     FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE
 );
 
+-- Systemindstillinger (fx månedsinterval)
+CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    effective_from DATE -- Gælder fra denne dato (forhindrer bagudrettede ændringer)
+);
+
+-- Månedsinterval historik (bevarer historik så ændringer ikke slår bagud)
+CREATE TABLE IF NOT EXISTS month_interval_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    start_day INTEGER NOT NULL, -- Første dag i perioden (fx 16)
+    end_day INTEGER NOT NULL,   -- Sidste dag i perioden (fx 15)
+    effective_from DATE NOT NULL, -- Gælder fra denne dato
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Index for hurtigere søgning
 CREATE INDEX IF NOT EXISTS idx_time_entries_child_id ON time_entries(child_id);
 CREATE INDEX IF NOT EXISTS idx_time_entries_caregiver_id ON time_entries(caregiver_id);
