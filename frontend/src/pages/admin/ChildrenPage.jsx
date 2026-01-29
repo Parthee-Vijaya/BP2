@@ -40,45 +40,13 @@ const CloseIcon = () => (
     </svg>
 );
 
-// PSP-element validering og formatering
-// Format: XX-0000000000-0000 (2 bogstaver - 10 tal - 4 tal)
-const PSP_REGEX = /^[A-Za-z]{2}-\d{10}-\d{4}$/;
-
-function validatePspElement(value) {
-    if (!value) return { valid: true, error: '' }; // Valgfrit felt
-    if (PSP_REGEX.test(value)) {
-        return { valid: true, error: '' };
-    }
-    return { valid: false, error: 'Format: XX-0000000000-0000 (f.eks. XG-0000010031-0003)' };
-}
-
-function formatPspElement(value) {
-    // Fjern alt undtagen bogstaver og tal
-    let cleaned = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-
-    // Indsæt bindestreger automatisk
-    let formatted = '';
-    if (cleaned.length > 0) {
-        formatted = cleaned.substring(0, 2); // Første 2 bogstaver
-    }
-    if (cleaned.length > 2) {
-        formatted += '-' + cleaned.substring(2, 12); // Næste 10 tal
-    }
-    if (cleaned.length > 12) {
-        formatted += '-' + cleaned.substring(12, 16); // Sidste 4 tal
-    }
-
-    return formatted;
-}
-
-export default function ChildrenPage() {
+export default function ChildrenPage({ readOnly = false }) {
     const [children, setChildren] = useState([]);
     const [caregivers, setCaregivers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editModal, setEditModal] = useState({ open: false, child: null });
     const [formData, setFormData] = useState({});
     const [searchQuery, setSearchQuery] = useState('');
-    const [pspError, setPspError] = useState('');
 
     useEffect(() => {
         loadData();
@@ -104,7 +72,6 @@ export default function ChildrenPage() {
             first_name: '',
             last_name: '',
             birth_date: '',
-            psp_element: '',
             grant_type: 'week',
             grant_hours: 0,
             grant_weekdays: {},
@@ -112,7 +79,6 @@ export default function ChildrenPage() {
             frame_hours: 0,
             caregiver_ids: []
         });
-        setPspError('');
         setEditModal({ open: true, child: null });
     }
 
@@ -121,7 +87,6 @@ export default function ChildrenPage() {
             first_name: child.first_name,
             last_name: child.last_name,
             birth_date: child.birth_date || '',
-            psp_element: child.psp_element || '',
             grant_type: child.grant_type,
             grant_hours: child.grant_hours || 0,
             grant_weekdays: child.grant_weekdays || {},
@@ -129,18 +94,10 @@ export default function ChildrenPage() {
             frame_hours: child.frame_hours || 0,
             caregiver_ids: child.caregivers?.map(c => c.id) || []
         });
-        setPspError('');
         setEditModal({ open: true, child });
     }
 
     async function handleSave() {
-        // Valider PSP-element
-        const pspValidation = validatePspElement(formData.psp_element);
-        if (!pspValidation.valid) {
-            setPspError(pspValidation.error);
-            return;
-        }
-
         try {
             if (editModal.child) {
                 await childrenApi.update(editModal.child.id, formData);
@@ -172,8 +129,7 @@ export default function ChildrenPage() {
         if (!searchQuery) return true;
         const query = searchQuery.toLowerCase();
         const fullName = `${child.first_name} ${child.last_name}`.toLowerCase();
-        const psp = (child.psp_element || '').toLowerCase();
-        return fullName.includes(query) || psp.includes(query);
+        return fullName.includes(query);
     });
 
     return (
@@ -183,15 +139,17 @@ export default function ChildrenPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h2 className="text-2xl font-bold text-gray-900">Børn</h2>
-                        <p className="text-gray-500 mt-1">Administrer børn og deres bevillinger</p>
+                        <p className="text-gray-500 mt-1">{readOnly ? 'Oversigt over børn og bevillinger' : 'Administrer børn og deres bevillinger'}</p>
                     </div>
-                    <button
-                        onClick={openCreateModal}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 btn-kalundborg rounded-xl font-medium"
-                    >
-                        <PlusIcon />
-                        Opret barn
-                    </button>
+                    {!readOnly && (
+                        <button
+                            onClick={openCreateModal}
+                            className="inline-flex items-center gap-2 px-5 py-2.5 btn-kalundborg rounded-xl font-medium"
+                        >
+                            <PlusIcon />
+                            Opret barn
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -203,7 +161,7 @@ export default function ChildrenPage() {
                     </div>
                     <input
                         type="text"
-                        placeholder="Søg barn (navn eller PSP-element)..."
+                        placeholder="Søg barn (navn)..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="glass-input pl-10 pr-4 py-2.5 rounded-xl text-sm w-full"
@@ -223,11 +181,10 @@ export default function ChildrenPage() {
                                 <tr className="bg-white/40 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     <th className="px-5 py-4">Navn</th>
                                     <th className="px-5 py-4">Fødselsdato</th>
-                                    <th className="px-5 py-4">PSP-element</th>
                                     <th className="px-5 py-4">Bevillingstype</th>
                                     <th className="px-5 py-4">Bevilling</th>
                                     <th className="px-5 py-4">Barnepiger</th>
-                                    <th className="px-5 py-4">Handlinger</th>
+                                    {!readOnly && <th className="px-5 py-4">Handlinger</th>}
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/20">
@@ -247,15 +204,6 @@ export default function ChildrenPage() {
                                         </td>
                                         <td className="px-5 py-4 text-sm text-gray-600">
                                             {child.birth_date ? formatDate(child.birth_date) : '-'}
-                                        </td>
-                                        <td className="px-5 py-4">
-                                            {child.psp_element ? (
-                                                <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-white/50 text-gray-700 border border-white/30">
-                                                    {child.psp_element}
-                                                </span>
-                                            ) : (
-                                                <span className="text-gray-400">-</span>
-                                            )}
                                         </td>
                                         <td className="px-5 py-4">
                                             <div className="space-y-1">
@@ -284,24 +232,26 @@ export default function ChildrenPage() {
                                         <td className="px-5 py-4 text-sm text-gray-500">
                                             {child.caregivers?.map(c => c.name).join(', ') || '-'}
                                         </td>
-                                        <td className="px-5 py-4">
-                                            <div className="flex items-center gap-1">
-                                                <button
-                                                    onClick={() => openEditModal(child)}
-                                                    className="p-2 text-gray-500 hover:text-[#B54A32] hover:bg-white/50 rounded-lg transition-all duration-200"
-                                                    title="Rediger"
-                                                >
-                                                    <EditIcon />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(child.id)}
-                                                    className="p-2 text-gray-500 hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-all duration-200"
-                                                    title="Slet"
-                                                >
-                                                    <TrashIcon />
-                                                </button>
-                                            </div>
-                                        </td>
+                                        {!readOnly && (
+                                            <td className="px-5 py-4">
+                                                <div className="flex items-center gap-1">
+                                                    <button
+                                                        onClick={() => openEditModal(child)}
+                                                        className="p-2 text-gray-500 hover:text-[#B54A32] hover:bg-white/50 rounded-lg transition-all duration-200"
+                                                        title="Rediger"
+                                                    >
+                                                        <EditIcon />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(child.id)}
+                                                        className="p-2 text-gray-500 hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-all duration-200"
+                                                        title="Slet"
+                                                    >
+                                                        <TrashIcon />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))}
                             </tbody>
@@ -374,38 +324,14 @@ export default function ChildrenPage() {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Fødselsdato</label>
-                                    <input
-                                        type="date"
-                                        value={formData.birth_date}
-                                        onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
-                                        className="glass-input w-full rounded-xl px-4 py-2.5"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">PSP-element</label>
-                                    <input
-                                        type="text"
-                                        value={formData.psp_element}
-                                        onChange={(e) => {
-                                            const formatted = formatPspElement(e.target.value);
-                                            setFormData({ ...formData, psp_element: formatted });
-                                            const validation = validatePspElement(formatted);
-                                            setPspError(validation.valid ? '' : validation.error);
-                                        }}
-                                        placeholder="XX-0000000000-0000"
-                                        maxLength={18}
-                                        className={`glass-input w-full rounded-xl px-4 py-2.5 ${
-                                            pspError ? 'border-red-400 focus:border-red-500' : ''
-                                        }`}
-                                    />
-                                    {pspError && (
-                                        <p className="mt-1.5 text-xs text-red-600 font-medium">{pspError}</p>
-                                    )}
-                                    <p className="mt-1.5 text-xs text-gray-400">Format: XX-0000000000-0000</p>
-                                </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Fødselsdato</label>
+                                <input
+                                    type="date"
+                                    value={formData.birth_date}
+                                    onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
+                                    className="glass-input w-full rounded-xl px-4 py-2.5"
+                                />
                             </div>
 
                             {/* Barnepiger */}

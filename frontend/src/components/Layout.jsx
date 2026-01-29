@@ -101,13 +101,37 @@ export default function Layout({ children, userRole, onRoleChange, isMobileView,
         { path: '/admin/barnepiger', label: 'Barnepiger', icon: Icons.users },
     ];
 
+    const godkenderNavItems = [
+        { path: '/godkender/godkendelse', label: 'Godkendelse', icon: Icons.check },
+        { path: '/godkender/boern', label: 'Børn', icon: Icons.child },
+        { path: '/godkender/barnepiger', label: 'Barnepiger', icon: Icons.users },
+    ];
+
     const caregiverNavItems = [
         { path: '/barnepige', label: 'Mine Børn', icon: Icons.child },
         { path: '/barnepige/registrer', label: 'Registrer Timer', icon: Icons.clock },
         { path: '/barnepige/mine-timer', label: 'Mine Registreringer', icon: Icons.list },
     ];
 
-    const navItems = userRole === 'admin' ? adminNavItems : caregiverNavItems;
+    const getNavItems = () => {
+        switch (userRole) {
+            case 'admin': return adminNavItems;
+            case 'godkender': return godkenderNavItems;
+            case 'caregiver': return caregiverNavItems;
+            default: return adminNavItems;
+        }
+    };
+
+    const navItems = getNavItems();
+
+    const getRoleLabel = () => {
+        switch (userRole) {
+            case 'admin': return 'Administrator';
+            case 'godkender': return 'Godkender';
+            case 'caregiver': return 'Barnepige';
+            default: return 'Ukendt';
+        }
+    };
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -156,7 +180,7 @@ export default function Layout({ children, userRole, onRoleChange, isMobileView,
 
                             {/* Role badge - glass style */}
                             <span className="hidden sm:inline-flex px-4 py-2 bg-white/10 backdrop-blur-sm text-white text-xs font-medium rounded-full border border-white/20 shadow-lg">
-                                {userRole === 'admin' ? 'Administrator' : 'Barnepige'}
+                                {getRoleLabel()}
                             </span>
 
                             {/* Role switcher (for demo) - glass style */}
@@ -168,6 +192,7 @@ export default function Layout({ children, userRole, onRoleChange, isMobileView,
                                     className="text-sm bg-white/10 backdrop-blur-sm text-white border border-white/20 rounded-xl px-4 py-2 focus:ring-2 focus:ring-white/30 focus:outline-none cursor-pointer hover:bg-white/20 transition-all shadow-lg"
                                 >
                                     <option value="admin" className="text-gray-900">Administrator</option>
+                                    <option value="godkender" className="text-gray-900">Godkender</option>
                                     <option value="caregiver" className="text-gray-900">Barnepige</option>
                                 </select>
                             </div>

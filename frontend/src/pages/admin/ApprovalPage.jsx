@@ -118,7 +118,7 @@ function SortableHeader({ label, sortKey, currentSort, onSort, className = '' })
     );
 }
 
-export default function ApprovalPage({ isMobileView = false }) {
+export default function ApprovalPage({ isMobileView = false, userRole = 'admin' }) {
     const [activeTab, setActiveTab] = useState('pending');
     const [entries, setEntries] = useState([]);
     const [children, setChildren] = useState([]);
@@ -133,7 +133,7 @@ export default function ApprovalPage({ isMobileView = false }) {
     const [rejectModal, setRejectModal] = useState({ open: false, entryId: null });
     const [rejectReason, setRejectReason] = useState('');
     const [viewReasonModal, setViewReasonModal] = useState({ open: false, reason: '', entry: null });
-    const [isCompactView, setIsCompactView] = useState(false);
+    const [isCompactView, setIsCompactView] = useState(true);
 
     // Sorterings-state: key + direction
     const [sortConfig, setSortConfig] = useState({ key: 'caregiver_name', direction: 'asc' });
@@ -382,8 +382,7 @@ export default function ApprovalPage({ isMobileView = false }) {
                 usedHours: totalUsed,
                 grantHours: totalGrant,
                 percentage,
-                isExceeded: anyExceeded || percentage >= 100,
-                isWarning: percentage >= 90 && percentage < 100
+                isExceeded: anyExceeded || percentage >= 100
             };
         }
 
@@ -395,8 +394,7 @@ export default function ApprovalPage({ isMobileView = false }) {
             usedHours: summary.usedHours,
             grantHours: summary.grantHours,
             percentage,
-            isExceeded: summary.exceeded || percentage >= 100,
-            isWarning: percentage >= 90 && percentage < 100
+            isExceeded: summary.exceeded || percentage >= 100
         };
     }
 
@@ -423,17 +421,19 @@ export default function ApprovalPage({ isMobileView = false }) {
                         <p className="text-gray-500 mt-1">Gennemgå og godkend timeregistreringer fra barnepiger</p>
                     </div>
                     <div className="flex items-center gap-3">
-                        {/* Månedsinterval indstilling */}
-                        <button
-                            onClick={() => setShowMonthIntervalModal(true)}
-                            className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all font-medium text-sm"
-                            title="Indstil månedsinterval"
-                        >
-                            <SettingsIcon />
-                            <span className="hidden sm:inline">
-                                Periode: d. {monthInterval.start_day} - d. {monthInterval.end_day}
-                            </span>
-                        </button>
+                        {/* Månedsinterval indstilling - kun for admin */}
+                        {userRole === 'admin' && (
+                            <button
+                                onClick={() => setShowMonthIntervalModal(true)}
+                                className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all font-medium text-sm"
+                                title="Indstil månedsinterval"
+                            >
+                                <SettingsIcon />
+                                <span className="hidden sm:inline">
+                                    Periode: d. {monthInterval.start_day} - d. {monthInterval.end_day}
+                                </span>
+                            </button>
+                        )}
 
                         {/* View toggle */}
                         <div className="flex bg-gray-100 rounded-xl p-1 border border-gray-200">
@@ -557,8 +557,8 @@ export default function ApprovalPage({ isMobileView = false }) {
                             ))}
                         </select>
 
-                        {/* Periode-søgning for godkendte */}
-                        {activeTab === 'approved' && (
+                        {/* Periode-søgning for godkendte - kun for admin */}
+                        {activeTab === 'approved' && userRole === 'admin' && (
                             <>
                                 <div className="flex items-center gap-2">
                                     <label className="text-xs text-gray-500 font-medium">Fra:</label>
@@ -652,6 +652,7 @@ export default function ApprovalPage({ isMobileView = false }) {
                                     <SortableHeader label="Dato" sortKey="date" currentSort={sortConfig} onSort={handleSort} className="text-left" />
                                     <SortableHeader label="Tid" sortKey="time" currentSort={sortConfig} onSort={handleSort} className="text-left" />
                                     <SortableHeader label="Timer" sortKey="total_hours" currentSort={sortConfig} onSort={handleSort} className="text-right" />
+                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tillæg</th>
                                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Bevilling</th>
                                     <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Handlinger</th>
                                 </tr>
@@ -660,7 +661,7 @@ export default function ApprovalPage({ isMobileView = false }) {
                                 {filteredEntries.map((entry) => {
                                     const grantStatus = getGrantStatus(entry.child_id);
                                     const isExceeded = grantStatus?.isExceeded;
-                                    const isWarning = grantStatus?.isWarning && !isExceeded;
+                                    const timeBreakdown = formatTimeBreakdown(entry);
 
                                     return (
                                         <tr
@@ -705,10 +706,22 @@ export default function ApprovalPage({ isMobileView = false }) {
                                                 <span className="font-bold text-gray-900">{formatHours(entry.total_hours)}</span>
                                             </td>
                                             <td className="px-4 py-3">
+                                                {/* Tillæg badges i kompakt visning */}
+                                                {timeBreakdown.length > 0 && (
+                                                    <div className="flex flex-wrap gap-1 mb-1">
+                                                        {timeBreakdown.map((item, idx) => (
+                                                            <span key={idx} className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${item.color}`}>
+                                                                {item.label}: {formatHours(item.value)}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </td>
+                                            <td className="px-4 py-3">
                                                 {grantStatus && (
                                                     <div className="min-w-[120px]">
                                                         <div className={`text-xs font-medium mb-1 ${
-                                                            isExceeded ? 'text-rose-600' : isWarning ? 'text-amber-600' : 'text-gray-600'
+                                                            isExceeded ? 'text-rose-600' : 'text-emerald-600'
                                                         }`}>
                                                             {formatHours(grantStatus.usedHours)}/{formatHours(grantStatus.grantHours)}
                                                             {isExceeded && (
@@ -718,7 +731,7 @@ export default function ApprovalPage({ isMobileView = false }) {
                                                         <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
                                                             <div
                                                                 className={`h-full rounded-full ${
-                                                                    isExceeded ? 'bg-rose-500' : isWarning ? 'bg-amber-500' : 'bg-emerald-500'
+                                                                    isExceeded ? 'bg-rose-500' : 'bg-emerald-500'
                                                                 }`}
                                                                 style={{ width: `${Math.min(grantStatus.percentage, 100)}%` }}
                                                             />
@@ -806,7 +819,6 @@ export default function ApprovalPage({ isMobileView = false }) {
                                 const grantStatus = getGrantStatus(entry.child_id);
                                 const childData = childrenMap[entry.child_id];
                                 const isExceeded = grantStatus?.isExceeded;
-                                const isWarning = grantStatus?.isWarning && !isExceeded;
                                 const timeBreakdown = formatTimeBreakdown(entry);
 
                                 return (
@@ -874,7 +886,6 @@ export default function ApprovalPage({ isMobileView = false }) {
                                                                     <div className="font-semibold text-gray-900">
                                                                         {entry.child_first_name} {entry.child_last_name}
                                                                     </div>
-                                                                    <div className="text-xs text-gray-500 font-mono">{childData?.psp_element || '-'}</div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -919,14 +930,14 @@ export default function ApprovalPage({ isMobileView = false }) {
                                                             <div className="flex-shrink-0 w-48">
                                                                 <div className="text-xs text-gray-500 mb-2 text-right">Bevillingsstatus</div>
                                                                 <div className={`text-right font-semibold mb-1 ${
-                                                                    isExceeded ? 'text-rose-600' : isWarning ? 'text-amber-600' : 'text-gray-700'
+                                                                    isExceeded ? 'text-rose-600' : 'text-emerald-600'
                                                                 }`}>
                                                                     {formatHours(grantStatus.usedHours)} / {formatHours(grantStatus.grantHours)} timer
                                                                 </div>
                                                                 <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
                                                                     <div
                                                                         className={`h-full rounded-full transition-all ${
-                                                                            isExceeded ? 'bg-rose-500' : isWarning ? 'bg-amber-500' : 'bg-emerald-500'
+                                                                            isExceeded ? 'bg-rose-500' : 'bg-emerald-500'
                                                                         }`}
                                                                         style={{ width: `${Math.min(grantStatus.percentage, 100)}%` }}
                                                                     />

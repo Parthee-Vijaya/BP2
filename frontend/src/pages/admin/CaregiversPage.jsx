@@ -38,7 +38,7 @@ const CloseIcon = () => (
     </svg>
 );
 
-// MA-nummer validering - max 8 tal
+// MA-nummer validering - altid præcis 8 cifre (paddes med foranstillede 0'er)
 function validateMaNumber(value) {
     if (!value) return { valid: false, error: 'MA-nummer er påkrævet' };
     const cleaned = value.replace(/\D/g, ''); // Kun tal
@@ -52,7 +52,13 @@ function formatMaNumber(value) {
     return value.replace(/\D/g, '').slice(0, 8);
 }
 
-export default function CaregiversPage() {
+// Pad MA-nummer med foranstillede 0'er til 8 cifre
+function padMaNumber(value) {
+    const cleaned = value.replace(/\D/g, '').slice(0, 8);
+    return cleaned.padStart(8, '0');
+}
+
+export default function CaregiversPage({ readOnly = false }) {
     const [caregivers, setCaregivers] = useState([]);
     const [children, setChildren] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -110,11 +116,17 @@ export default function CaregiversPage() {
             return;
         }
 
+        // Pad MA-nummer til 8 cifre med foranstillede 0'er
+        const dataToSave = {
+            ...formData,
+            ma_number: padMaNumber(formData.ma_number)
+        };
+
         try {
             if (editModal.caregiver) {
-                await caregiversApi.update(editModal.caregiver.id, formData);
+                await caregiversApi.update(editModal.caregiver.id, dataToSave);
             } else {
-                await caregiversApi.create(formData);
+                await caregiversApi.create(dataToSave);
             }
             setEditModal({ open: false, caregiver: null });
             loadData();
@@ -150,15 +162,17 @@ export default function CaregiversPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h2 className="text-2xl font-bold text-gray-900">Barnepiger</h2>
-                        <p className="text-gray-500 mt-1">Administrer barnepiger og deres tilknytninger</p>
+                        <p className="text-gray-500 mt-1">{readOnly ? 'Oversigt over barnepiger' : 'Administrer barnepiger og deres tilknytninger'}</p>
                     </div>
-                    <button
-                        onClick={openCreateModal}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 btn-kalundborg rounded-xl font-medium"
-                    >
-                        <PlusIcon />
-                        Opret barnepige
-                    </button>
+                    {!readOnly && (
+                        <button
+                            onClick={openCreateModal}
+                            className="inline-flex items-center gap-2 px-5 py-2.5 btn-kalundborg rounded-xl font-medium"
+                        >
+                            <PlusIcon />
+                            Opret barnepige
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -191,7 +205,7 @@ export default function CaregiversPage() {
                                     <th className="px-5 py-4">Navn</th>
                                     <th className="px-5 py-4">MA-nummer</th>
                                     <th className="px-5 py-4">Tilknyttede børn</th>
-                                    <th className="px-5 py-4">Handlinger</th>
+                                    {!readOnly && <th className="px-5 py-4">Handlinger</th>}
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/20">
@@ -230,24 +244,26 @@ export default function CaregiversPage() {
                                                 <span className="text-gray-400">Ingen børn tilknyttet</span>
                                             )}
                                         </td>
-                                        <td className="px-5 py-4">
-                                            <div className="flex items-center gap-1">
-                                                <button
-                                                    onClick={() => openEditModal(caregiver)}
-                                                    className="p-2 text-gray-500 hover:text-[#B54A32] hover:bg-white/50 rounded-lg transition-all duration-200"
-                                                    title="Rediger"
-                                                >
-                                                    <EditIcon />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(caregiver.id)}
-                                                    className="p-2 text-gray-500 hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-all duration-200"
-                                                    title="Slet"
-                                                >
-                                                    <TrashIcon />
-                                                </button>
-                                            </div>
-                                        </td>
+                                        {!readOnly && (
+                                            <td className="px-5 py-4">
+                                                <div className="flex items-center gap-1">
+                                                    <button
+                                                        onClick={() => openEditModal(caregiver)}
+                                                        className="p-2 text-gray-500 hover:text-[#B54A32] hover:bg-white/50 rounded-lg transition-all duration-200"
+                                                        title="Rediger"
+                                                    >
+                                                        <EditIcon />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(caregiver.id)}
+                                                        className="p-2 text-gray-500 hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-all duration-200"
+                                                        title="Slet"
+                                                    >
+                                                        <TrashIcon />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))}
                             </tbody>
@@ -319,7 +335,7 @@ export default function CaregiversPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">MA-nummer * (max 8 cifre)</label>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">MA-nummer * (8 cifre)</label>
                                 <input
                                     type="text"
                                     value={formData.ma_number}
@@ -329,7 +345,7 @@ export default function CaregiversPage() {
                                         const validation = validateMaNumber(formatted);
                                         setMaError(validation.valid ? '' : validation.error);
                                     }}
-                                    placeholder="12345678"
+                                    placeholder="Indtast 1-8 cifre (paddes automatisk)"
                                     maxLength={8}
                                     className={`glass-input w-full rounded-xl px-4 py-2.5 ${
                                         maError ? 'border-red-400 focus:border-red-500' : ''
@@ -338,7 +354,7 @@ export default function CaregiversPage() {
                                 {maError && (
                                     <p className="mt-1.5 text-xs text-red-600 font-medium">{maError}</p>
                                 )}
-                                <p className="mt-1.5 text-xs text-gray-400">Kun tal, max 8 cifre</p>
+                                <p className="mt-1.5 text-xs text-gray-400">Kun tal, paddes til 8 cifre med foranstillede 0'er (fx "123" → "00000123")</p>
                             </div>
 
                             <div>
