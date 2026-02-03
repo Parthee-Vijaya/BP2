@@ -193,7 +193,7 @@ export default function RegisterTime({ caregiverId = 1 }) {
 
                     {/* Bevillingstype valg - vises kun hvis barnet har rammebevilling */}
                     {!!selectedChild?.has_frame_grant && (
-                        <div className="p-4 bg-purple-50 rounded-xl border border-purple-200">
+                        <div className="p-4 bg-[#7a6a8a]/10 rounded-xl border border-[#7a6a8a]/20">
                             <label className="block text-sm font-semibold text-gray-700 mb-3">Vælg bevillingstype *</label>
                             <div className="space-y-3">
                                 <label className="flex items-start gap-3 p-3 bg-white rounded-lg border border-gray-200 cursor-pointer hover:border-[#B54A32]/30 transition-all">
@@ -215,17 +215,17 @@ export default function RegisterTime({ caregiverId = 1 }) {
                                         </div>
                                     </div>
                                 </label>
-                                <label className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg border border-purple-200 cursor-pointer hover:border-purple-400 transition-all">
+                                <label className="flex items-start gap-3 p-3 bg-[#7a6a8a]/10 rounded-lg border border-[#7a6a8a]/20 cursor-pointer hover:border-[#7a6a8a]/40 transition-all">
                                     <input
                                         type="radio"
                                         name="grant_type"
                                         checked={formData.use_frame_grant}
                                         onChange={() => setFormData({ ...formData, use_frame_grant: true })}
-                                        className="mt-1 text-purple-600 focus:ring-purple-500"
+                                        className="mt-1 text-[#7a6a8a] focus:ring-[#7a6a8a]"
                                     />
                                     <div>
-                                        <div className="font-medium text-purple-700">Rammebevilling</div>
-                                        <div className="text-sm text-purple-600">
+                                        <div className="font-medium text-[#7a6a8a]">Rammebevilling</div>
+                                        <div className="text-sm text-[#7a6a8a]">
                                             {selectedChild.frame_hours} timer pr. år
                                         </div>
                                     </div>
@@ -250,11 +250,11 @@ export default function RegisterTime({ caregiverId = 1 }) {
                                 }
                             }}
                             max={new Date().toISOString().split('T')[0]}
-                            className={`glass-input w-full rounded-xl px-4 py-3 ${formData._futureDateError ? 'border-rose-400 ring-2 ring-rose-200' : ''}`}
+                            className={`glass-input w-full rounded-xl px-4 py-3 ${formData._futureDateError ? 'border-[#8a5a5a] ring-2 ring-[#8a5a5a]/20' : ''}`}
                             required
                         />
                         {formData._futureDateError ? (
-                            <div className="mt-2 p-3 bg-rose-50 border border-rose-300 rounded-xl text-rose-700 text-sm font-medium flex items-center gap-2">
+                            <div className="mt-2 p-3 bg-[#8a5a5a]/10 border border-[#8a5a5a]/30 rounded-xl text-[#8a5a5a] text-sm font-medium flex items-center gap-2">
                                 <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                                 </svg>
@@ -306,8 +306,8 @@ export default function RegisterTime({ caregiverId = 1 }) {
                     <div
                         className={`rounded-2xl p-6 backdrop-blur-sm border-2 animate-fade-in-up ${
                             grantExceeded || grantError
-                                ? 'bg-rose-500/10 border-rose-500/30'
-                                : 'bg-emerald-500/10 border-emerald-500/30'
+                                ? 'bg-[#8a5a5a]/10 border-[#8a5a5a]/30'
+                                : 'bg-[#5a7a6a]/10 border-[#5a7a6a]/30'
                         }`}
                         style={{ animationDelay: '0.2s' }}
                     >
@@ -349,11 +349,11 @@ export default function RegisterTime({ caregiverId = 1 }) {
                         {preview.grantStatus && (
                             <div className={`p-4 rounded-xl backdrop-blur-sm ${
                                 grantExceeded || grantError
-                                    ? 'bg-rose-500/15 border border-rose-500/30'
-                                    : 'bg-emerald-500/15 border border-emerald-500/30'
+                                    ? 'bg-[#8a5a5a]/15 border border-[#8a5a5a]/30'
+                                    : 'bg-[#5a7a6a]/15 border border-[#5a7a6a]/30'
                             }`}>
                                 {grantError ? (
-                                    <div className="text-rose-700">
+                                    <div className="text-[#8a5a5a]">
                                         <div className="flex items-center gap-2 font-bold">
                                             <WarningIcon />
                                             <span>{grantError}</span>
@@ -365,7 +365,7 @@ export default function RegisterTime({ caregiverId = 1 }) {
                                         )}
                                     </div>
                                 ) : grantExceeded ? (
-                                    <div className="text-rose-700">
+                                    <div className="text-[#8a5a5a]">
                                         <div className="flex items-center gap-2 font-bold">
                                             <WarningIcon />
                                             <span>Bevilling overskrides!</span>
@@ -374,13 +374,13 @@ export default function RegisterTime({ caregiverId = 1 }) {
                                             <div>Forbrugt: {formatHours(preview.grantStatus.usedHours)} / {formatHours(preview.grantStatus.grantHours)} timer</div>
                                             <div>Efter registrering: {formatHours(preview.grantStatus.totalAfterNew)} timer</div>
                                             <div className="font-semibold">Overskredet med: {formatHours(preview.grantStatus.exceededBy)} timer</div>
-                                            <div className="mt-2 p-2 bg-rose-50 border border-rose-200 rounded text-rose-800 text-xs">
+                                            <div className="mt-2 p-2 bg-[#8a5a5a]/10 border border-[#8a5a5a]/20 rounded text-[#8a5a5a] text-xs">
                                                 Det indtastede antal timer overskrider bevillingen. Det er godkender/leders opgave at sikre at det kan godkendes.
                                             </div>
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="text-emerald-700">
+                                    <div className="text-[#5a7a6a]">
                                         <div className="flex items-center gap-2 font-bold">
                                             <CheckIcon />
                                             <span>Inden for bevilling</span>
@@ -405,7 +405,7 @@ export default function RegisterTime({ caregiverId = 1 }) {
                             submitting
                                 ? 'bg-gray-400 cursor-not-allowed'
                                 : grantExceeded || grantError
-                                ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-500/30 hover:shadow-rose-500/40'
+                                ? 'bg-[#8a5a5a] hover:bg-[#7a4a4a] shadow-sm'
                                 : 'btn-kalundborg'
                         }`}
                     >
@@ -426,7 +426,7 @@ export default function RegisterTime({ caregiverId = 1 }) {
                 </div>
 
                 {(grantExceeded || grantError) && (
-                    <p className="text-sm text-rose-600 text-center font-medium animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+                    <p className="text-sm text-[#8a5a5a] text-center font-medium animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
                         Bemærk: Registreringen vil blive oprettet, men markeret som overskridelse.
                     </p>
                 )}

@@ -103,7 +103,7 @@ export default function AdminDashboard() {
                     style={{ animationDelay: '0.1s' }}
                 >
                     <div className="flex items-center justify-between">
-                        <div className="w-14 h-14 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-amber-500/30">
+                        <div className="w-14 h-14 bg-[#8a7a55] rounded-xl flex items-center justify-center text-white shadow-sm">
                             <ClockIcon />
                         </div>
                         <div className="text-gray-400 group-hover:text-[#B54A32] transition-colors">
@@ -120,7 +120,7 @@ export default function AdminDashboard() {
                     className="glass-card rounded-2xl p-6 animate-fade-in-up"
                     style={{ animationDelay: '0.2s' }}
                 >
-                    <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
+                    <div className="w-14 h-14 bg-[#5a7a6a] rounded-xl flex items-center justify-center text-white shadow-sm">
                         <CheckIcon />
                     </div>
                     <div className="mt-5">
@@ -154,7 +154,7 @@ export default function AdminDashboard() {
                     style={{ animationDelay: '0.4s' }}
                 >
                     <div className="flex items-center justify-between">
-                        <div className="w-14 h-14 bg-gradient-to-br from-violet-400 to-violet-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-violet-500/30">
+                        <div className="w-14 h-14 bg-[#6a5a8a] rounded-xl flex items-center justify-center text-white shadow-sm">
                             <UsersIcon />
                         </div>
                         <div className="text-gray-400 group-hover:text-[#B54A32] transition-colors">
@@ -217,7 +217,7 @@ export default function AdminDashboard() {
 
             {recentPending.length === 0 && (
                 <div className="glass-card rounded-2xl p-12 text-center animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
-                    <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-emerald-500/30">
+                    <div className="w-20 h-20 bg-[#5a7a6a] rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-sm">
                         <CheckIcon />
                     </div>
                     <h3 className="text-xl font-semibold text-gray-900">Ingen afventende registreringer</h3>

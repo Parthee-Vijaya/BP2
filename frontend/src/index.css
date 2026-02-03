@@ -108,56 +108,47 @@ body {
 }
 
 /* ==========================================
-   STATUS BADGES - GLASS VERSION
+   STATUS BADGES - MUTED VERSION
    ========================================== */
 
 .status-pending {
-  background: rgba(251, 191, 36, 0.15);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(251, 191, 36, 0.3);
-  color: #b45309;
+  background: rgba(180, 160, 120, 0.12);
+  border: 1px solid rgba(160, 140, 100, 0.25);
+  color: #8a7a55;
 }
 
 .status-approved {
-  background: rgba(16, 185, 129, 0.15);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  color: #047857;
+  background: rgba(100, 140, 120, 0.12);
+  border: 1px solid rgba(90, 130, 110, 0.25);
+  color: #4a6a5a;
 }
 
 .status-rejected {
-  background: rgba(244, 63, 94, 0.15);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(244, 63, 94, 0.3);
-  color: #be123c;
+  background: rgba(160, 100, 100, 0.12);
+  border: 1px solid rgba(150, 90, 90, 0.25);
+  color: #8a5a5a;
 }
 
 /* ==========================================
-   GRANT STATUS - GLASS VERSION
+   GRANT STATUS - MUTED VERSION
    ========================================== */
 
 .grant-exceeded {
-  background: rgba(244, 63, 94, 0.1);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(244, 63, 94, 0.3);
-  color: #be123c;
+  background: rgba(160, 100, 100, 0.08);
+  border: 1px solid rgba(150, 90, 90, 0.2);
+  color: #8a5a5a;
 }
 
 .grant-ok {
-  background: rgba(16, 185, 129, 0.1);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  color: #047857;
+  background: rgba(100, 140, 120, 0.08);
+  border: 1px solid rgba(90, 130, 110, 0.2);
+  color: #4a6a5a;
 }
 
 .grant-warning {
-  background: rgba(251, 191, 36, 0.1);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(251, 191, 36, 0.3);
-  color: #b45309;
+  background: rgba(180, 160, 120, 0.08);
+  border: 1px solid rgba(160, 140, 100, 0.2);
+  color: #8a7a55;
 }
 
 /* ==========================================
@@ -180,20 +171,59 @@ body {
 }
 
 .btn-kalundborg {
-  background: linear-gradient(135deg, #B54A32 0%, #9a3f2b 100%);
+  background: #B54A32;
   color: white;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(181, 74, 50, 0.3);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(181, 74, 50, 0.15);
 }
 
 .btn-kalundborg:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(181, 74, 50, 0.4);
+  background: #a3432d;
+  box-shadow: 0 4px 12px rgba(181, 74, 50, 0.2);
 }
 
 .btn-kalundborg:active {
-  transform: translateY(0);
+  background: #8f3a27;
 }
+
+/* ==========================================
+   MUTED COLOR UTILITIES - For tillæg badges
+   ========================================== */
+
+/* Muted blue (Normal timer) */
+.text-muted-blue { color: #5a7a8a; }
+.bg-muted-blue { background-color: rgba(90, 122, 138, 0.1); }
+.border-muted-blue { border-color: rgba(90, 122, 138, 0.2); }
+
+/* Muted purple (Aften) */
+.text-muted-purple { color: #7a6a8a; }
+.bg-muted-purple { background-color: rgba(122, 106, 138, 0.1); }
+.border-muted-purple { border-color: rgba(122, 106, 138, 0.2); }
+
+/* Muted indigo (Nat) */
+.text-muted-indigo { color: #6a6a8a; }
+.bg-muted-indigo { background-color: rgba(106, 106, 138, 0.1); }
+.border-muted-indigo { border-color: rgba(106, 106, 138, 0.2); }
+
+/* Muted amber (Lørdag) */
+.text-muted-amber { color: #8a7a5a; }
+.bg-muted-amber { background-color: rgba(138, 122, 90, 0.1); }
+.border-muted-amber { border-color: rgba(138, 122, 90, 0.2); }
+
+/* Muted rose (Søn/Hellig) */
+.text-muted-rose { color: #8a5a6a; }
+.bg-muted-rose { background-color: rgba(138, 90, 106, 0.1); }
+.border-muted-rose { border-color: rgba(138, 90, 106, 0.2); }
+
+/* Muted green (Godkendt) */
+.text-muted-green { color: #5a7a6a; }
+.bg-muted-green { background-color: rgba(90, 122, 106, 0.1); }
+.border-muted-green { border-color: rgba(90, 122, 106, 0.2); }
+
+/* Muted red (Afvist) */
+.text-muted-red { color: #8a5a5a; }
+.bg-muted-red { background-color: rgba(138, 90, 90, 0.1); }
+.border-muted-red { border-color: rgba(138, 90, 90, 0.2); }
 
 /* ==========================================
    HOVER EFFECTS

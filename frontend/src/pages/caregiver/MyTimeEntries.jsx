@@ -174,16 +174,16 @@ export default function MyTimeEntries({ caregiverId = 1 }) {
 
                                 {/* Rejection reason */}
                                 {entry.status === 'rejected' && entry.rejection_reason && (
-                                    <div className="mt-4 p-4 bg-rose-500/10 rounded-xl border border-rose-500/20 backdrop-blur-sm">
-                                        <div className="text-sm font-bold text-rose-700 flex items-center gap-2">
+                                    <div className="mt-4 p-4 bg-[#8a5a5a]/10 rounded-xl border border-[#8a5a5a]/20 backdrop-blur-sm">
+                                        <div className="text-sm font-bold text-[#8a5a5a] flex items-center gap-2">
                                             <XIcon />
                                             Årsag til afvisning:
                                         </div>
-                                        <div className="text-sm text-rose-600 mt-1">{entry.rejection_reason}</div>
-                                        <div className="text-xs text-rose-500 mt-2">
+                                        <div className="text-sm text-[#8a5a5a] mt-1">{entry.rejection_reason}</div>
+                                        <div className="text-xs text-[#8a5a5a]/70 mt-2">
                                             Afvist af {entry.reviewed_by} • {formatDate(entry.reviewed_at)}
                                         </div>
-                                        <div className="mt-3 pt-3 border-t border-rose-500/20 text-xs text-gray-500">
+                                        <div className="mt-3 pt-3 border-t border-[#8a5a5a]/20 text-xs text-gray-500">
                                             Bemærk: Afviste registreringer kan ikke rettes. Opret en ny registrering i stedet.
                                         </div>
                                     </div>
@@ -191,12 +191,12 @@ export default function MyTimeEntries({ caregiverId = 1 }) {
 
                                 {/* Approved info */}
                                 {entry.status === 'approved' && (
-                                    <div className="mt-4 p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20 backdrop-blur-sm">
-                                        <div className="text-sm text-emerald-700 flex items-center gap-2">
+                                    <div className="mt-4 p-3 bg-[#5a7a6a]/10 rounded-xl border border-[#5a7a6a]/20 backdrop-blur-sm">
+                                        <div className="text-sm text-[#5a7a6a] flex items-center gap-2">
                                             <CheckIcon />
                                             <span className="font-semibold">Godkendt af {entry.reviewed_by}</span>
                                             {entry.payroll_date && (
-                                                <span className="text-emerald-600">• Data sendt: {new Date(entry.payroll_date).toLocaleString('da-DK', {
+                                                <span className="text-[#5a7a6a]">• Data sendt: {new Date(entry.payroll_date).toLocaleString('da-DK', {
                                                     day: '2-digit',
                                                     month: '2-digit',
                                                     year: 'numeric',

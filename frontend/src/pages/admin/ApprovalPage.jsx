@@ -394,11 +394,11 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
 
     function formatTimeBreakdown(entry) {
         const parts = [];
-        if (entry.normal_hours > 0) parts.push({ label: 'Normal', value: entry.normal_hours, color: 'bg-blue-100 text-blue-700' });
-        if (entry.evening_hours > 0) parts.push({ label: 'Aften', value: entry.evening_hours, color: 'bg-purple-100 text-purple-700' });
-        if (entry.night_hours > 0) parts.push({ label: 'Nat', value: entry.night_hours, color: 'bg-indigo-100 text-indigo-700' });
-        if (entry.saturday_hours > 0) parts.push({ label: 'Lørdag', value: entry.saturday_hours, color: 'bg-orange-100 text-orange-700' });
-        if (entry.sunday_holiday_hours > 0) parts.push({ label: 'Søn/Hellig', value: entry.sunday_holiday_hours, color: 'bg-red-100 text-red-700' });
+        if (entry.normal_hours > 0) parts.push({ label: 'Normal', value: entry.normal_hours, color: 'bg-muted-blue text-muted-blue border border-muted-blue' });
+        if (entry.evening_hours > 0) parts.push({ label: 'Aften', value: entry.evening_hours, color: 'bg-muted-purple text-muted-purple border border-muted-purple' });
+        if (entry.night_hours > 0) parts.push({ label: 'Nat', value: entry.night_hours, color: 'bg-muted-indigo text-muted-indigo border border-muted-indigo' });
+        if (entry.saturday_hours > 0) parts.push({ label: 'Lørdag', value: entry.saturday_hours, color: 'bg-muted-amber text-muted-amber border border-muted-amber' });
+        if (entry.sunday_holiday_hours > 0) parts.push({ label: 'Søn/Hellig', value: entry.sunday_holiday_hours, color: 'bg-muted-rose text-muted-rose border border-muted-rose' });
         return parts;
     }
 
@@ -477,7 +477,7 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                         <a
                             href={exportApi.timeEntries({ status: activeTab })}
                             download
-                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all font-medium shadow-lg shadow-emerald-500/25"
+                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#5a7a6a] text-white rounded-xl hover:bg-[#4a6a5a] transition-all font-medium shadow-sm"
                         >
                             <DownloadIcon />
                             Eksporter CSV
@@ -492,12 +492,12 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                             <div className="text-3xl font-bold text-gray-900">{filteredEntries.length}</div>
                             <div className="text-sm text-gray-500">Afventer godkendelse</div>
                         </div>
-                        <div className="bg-rose-50 rounded-xl p-4 border border-rose-200">
+                        <div className="bg-[#8a5a5a]/10 rounded-xl p-4 border border-[#8a5a5a]/20">
                             <div className="flex items-center gap-2">
-                                <div className="text-3xl font-bold text-rose-600">{exceededCount}</div>
-                                {exceededCount > 0 && <WarningIcon className="text-rose-500" />}
+                                <div className="text-3xl font-bold text-[#8a5a5a]">{exceededCount}</div>
+                                {exceededCount > 0 && <WarningIcon className="text-[#8a5a5a]" />}
                             </div>
-                            <div className="text-sm text-rose-600">Overskrider bevilling</div>
+                            <div className="text-sm text-[#8a5a5a]">Overskrider bevilling</div>
                         </div>
                     </div>
                 )}
@@ -546,28 +546,28 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                             </div>
                             {/* Separator */}
                             <div className="hidden sm:block h-4 w-px bg-gray-300"></div>
-                            {/* Tillægsfordeling med navne */}
+                            {/* Tillægsfordeling med navne - muted farver */}
                             <div className="flex items-center gap-4 text-xs">
                                 <span className="text-gray-400">Fordeling:</span>
                                 <span className="inline-flex items-center gap-1.5">
                                     <span className="text-gray-500">Normal:</span>
-                                    <span className="font-semibold text-blue-600">{formatHours(summary.normalHours)}</span>
+                                    <span className="font-semibold text-muted-blue">{formatHours(summary.normalHours)}</span>
                                 </span>
                                 <span className="inline-flex items-center gap-1.5">
                                     <span className="text-gray-500">Aften:</span>
-                                    <span className="font-semibold text-purple-600">{formatHours(summary.eveningHours)}</span>
+                                    <span className="font-semibold text-muted-purple">{formatHours(summary.eveningHours)}</span>
                                 </span>
                                 <span className="inline-flex items-center gap-1.5">
                                     <span className="text-gray-500">Nat:</span>
-                                    <span className="font-semibold text-indigo-600">{formatHours(summary.nightHours)}</span>
+                                    <span className="font-semibold text-muted-indigo">{formatHours(summary.nightHours)}</span>
                                 </span>
                                 <span className="inline-flex items-center gap-1.5">
                                     <span className="text-gray-500">Lørdag:</span>
-                                    <span className="font-semibold text-orange-600">{formatHours(summary.saturdayHours)}</span>
+                                    <span className="font-semibold text-muted-amber">{formatHours(summary.saturdayHours)}</span>
                                 </span>
                                 <span className="inline-flex items-center gap-1.5">
                                     <span className="text-gray-500">Søn/Hellig:</span>
-                                    <span className="font-semibold text-red-600">{formatHours(summary.sundayHours)}</span>
+                                    <span className="font-semibold text-muted-rose">{formatHours(summary.sundayHours)}</span>
                                 </span>
                             </div>
                         </div>
@@ -684,7 +684,7 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                 <button
                                     onClick={handleBatchApprove}
                                     disabled={selectedIds.length === 0}
-                                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-lg shadow-emerald-500/25"
+                                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#5a7a6a] text-white rounded-xl hover:bg-[#4a6a5a] disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm"
                                 >
                                     <CheckMarkIcon />
                                     Godkend valgte ({selectedIds.length})
@@ -702,7 +702,7 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                     </div>
                 ) : filteredEntries.length === 0 ? (
                     <div className="p-16 text-center">
-                        <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-500/30 text-white">
+                        <div className="w-20 h-20 bg-[#5a7a6a] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm text-white">
                             <CheckIcon />
                         </div>
                         <p className="text-gray-700 font-semibold text-lg">
@@ -750,7 +750,7 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                             className={`
                                                 transition-colors
                                                 ${activeTab === 'pending' && isExceeded
-                                                    ? 'bg-rose-50 hover:bg-rose-100'
+                                                    ? 'bg-[#8a5a5a]/10 hover:bg-[#8a5a5a]/15'
                                                     : 'hover:bg-gray-50'
                                                 }
                                             `}
@@ -802,7 +802,7 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                                 {grantStatus && (
                                                     <div className="min-w-[120px]">
                                                         <div className={`text-xs font-medium mb-1 ${
-                                                            isExceeded ? 'text-rose-600' : 'text-emerald-600'
+                                                            isExceeded ? 'text-[#8a5a5a]' : 'text-[#5a7a6a]'
                                                         }`}>
                                                             {formatHours(grantStatus.usedHours)}/{formatHours(grantStatus.grantHours)}
                                                             {isExceeded && (
@@ -812,7 +812,7 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                                         <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
                                                             <div
                                                                 className={`h-full rounded-full ${
-                                                                    isExceeded ? 'bg-rose-500' : 'bg-emerald-500'
+                                                                    isExceeded ? 'bg-[#8a5a5a]' : 'bg-[#5a7a6a]'
                                                                 }`}
                                                                 style={{ width: `${Math.min(grantStatus.percentage, 100)}%` }}
                                                             />
@@ -825,13 +825,13 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                                     <div className="flex justify-end gap-2">
                                                         <button
                                                             onClick={() => handleApprove(entry.id)}
-                                                            className="px-3 py-1.5 bg-emerald-500 text-white text-xs rounded-lg font-medium hover:bg-emerald-600 transition-colors"
+                                                            className="px-3 py-1.5 bg-[#5a7a6a] text-white text-xs rounded-lg font-medium hover:bg-[#4a6a5a] transition-colors"
                                                         >
                                                             Godkend
                                                         </button>
                                                         <button
                                                             onClick={() => setRejectModal({ open: true, entryId: entry.id })}
-                                                            className="px-3 py-1.5 bg-rose-500 text-white text-xs rounded-lg font-medium hover:bg-rose-600 transition-colors"
+                                                            className="px-3 py-1.5 bg-[#8a5a5a] text-white text-xs rounded-lg font-medium hover:bg-[#7a4a4a] transition-colors"
                                                         >
                                                             Afvis
                                                         </button>
@@ -840,7 +840,7 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                                 {activeTab === 'approved' && (
                                                     <div className="flex justify-end items-center gap-2">
                                                         {entry.payroll_date ? (
-                                                            <span className="text-xs text-emerald-600 font-medium">
+                                                            <span className="text-xs text-[#5a7a6a] font-medium">
                                                                 Sendt {formatShortDate(entry.payroll_date)}
                                                             </span>
                                                         ) : (
@@ -856,7 +856,7 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                                 {activeTab === 'rejected' && (
                                                     <button
                                                         onClick={() => setViewReasonModal({ open: true, reason: entry.rejection_reason, entry })}
-                                                        className="text-rose-600 hover:text-rose-700 text-xs font-medium underline"
+                                                        className="text-[#8a5a5a] hover:text-[#7a4a4a] text-xs font-medium underline"
                                                     >
                                                         Se årsag
                                                     </button>
@@ -906,15 +906,15 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                         className={`
                                             relative rounded-xl border transition-all duration-200
                                             ${activeTab === 'pending' && isExceeded
-                                                ? 'bg-rose-50 border-rose-300 shadow-sm'
+                                                ? 'bg-[#8a5a5a]/10 border-[#8a5a5a]/30 shadow-sm'
                                                 : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
                                             }
                                         `}
                                     >
                                         {/* Bevilling overskredet notifikation */}
                                         {isExceeded && (
-                                            <div className="px-6 py-2 bg-rose-100 border-b border-rose-200 rounded-t-xl">
-                                                <div className="flex items-center gap-2 text-rose-700 text-xs font-medium">
+                                            <div className="px-6 py-2 bg-[#8a5a5a]/15 border-b border-[#8a5a5a]/20 rounded-t-xl">
+                                                <div className="flex items-center gap-2 text-[#8a5a5a] text-xs font-medium">
                                                     <WarningIcon />
                                                     Det indtastede antal timer overskrider bevillingen. Det er godkender/leders opgave at sikre at det kan godkendes.
                                                 </div>
@@ -1009,20 +1009,20 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                                             <div className="flex-shrink-0 w-48">
                                                                 <div className="text-xs text-gray-500 mb-2 text-right">Bevillingsstatus</div>
                                                                 <div className={`text-right font-semibold mb-1 ${
-                                                                    isExceeded ? 'text-rose-600' : 'text-emerald-600'
+                                                                    isExceeded ? 'text-[#8a5a5a]' : 'text-[#5a7a6a]'
                                                                 }`}>
                                                                     {formatHours(grantStatus.usedHours)} / {formatHours(grantStatus.grantHours)} timer
                                                                 </div>
                                                                 <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
                                                                     <div
                                                                         className={`h-full rounded-full transition-all ${
-                                                                            isExceeded ? 'bg-rose-500' : 'bg-emerald-500'
+                                                                            isExceeded ? 'bg-[#8a5a5a]' : 'bg-[#5a7a6a]'
                                                                         }`}
                                                                         style={{ width: `${Math.min(grantStatus.percentage, 100)}%` }}
                                                                     />
                                                                 </div>
                                                                 {isExceeded && (
-                                                                    <div className="text-xs text-rose-600 font-bold mt-1 text-right">
+                                                                    <div className="text-xs text-[#8a5a5a] font-bold mt-1 text-right">
                                                                         +{formatHours(grantStatus.usedHours - grantStatus.grantHours)} over grænsen
                                                                     </div>
                                                                 )}
@@ -1034,14 +1034,14 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                                             <div className="flex gap-2 flex-shrink-0">
                                                                 <button
                                                                     onClick={() => handleApprove(entry.id)}
-                                                                    className="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-medium hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg shadow-emerald-500/25 flex items-center gap-2"
+                                                                    className="px-5 py-2.5 bg-[#5a7a6a] text-white rounded-xl font-medium hover:bg-[#4a6a5a] transition-all shadow-sm flex items-center gap-2"
                                                                 >
                                                                     <CheckMarkIcon />
                                                                     Godkend
                                                                 </button>
                                                                 <button
                                                                     onClick={() => setRejectModal({ open: true, entryId: entry.id })}
-                                                                    className="px-5 py-2.5 bg-gradient-to-r from-rose-500 to-rose-600 text-white rounded-xl font-medium hover:from-rose-600 hover:to-rose-700 transition-all shadow-lg shadow-rose-500/25 flex items-center gap-2"
+                                                                    className="px-5 py-2.5 bg-[#8a5a5a] text-white rounded-xl font-medium hover:bg-[#7a4a4a] transition-all shadow-sm flex items-center gap-2"
                                                                 >
                                                                     <XIcon />
                                                                     Afvis
@@ -1056,7 +1056,7 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                                                     <div className="font-medium text-gray-700">{entry.reviewed_by}</div>
                                                                 </div>
                                                                 {entry.payroll_date ? (
-                                                                    <span className="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-medium">
+                                                                    <span className="px-3 py-1.5 bg-[#5a7a6a]/15 text-[#5a7a6a] rounded-lg text-sm font-medium">
                                                                         Sendt {formatShortDate(entry.payroll_date)}
                                                                     </span>
                                                                 ) : (
@@ -1075,7 +1075,7 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                                                 <div className="text-xs text-gray-500 mb-1">Afvist af {entry.reviewed_by}</div>
                                                                 <button
                                                                     onClick={() => setViewReasonModal({ open: true, reason: entry.rejection_reason, entry })}
-                                                                    className="text-rose-600 hover:text-rose-700 text-sm font-medium underline"
+                                                                    className="text-[#8a5a5a] hover:text-[#7a4a4a] text-sm font-medium underline"
                                                                 >
                                                                     Se årsag
                                                                 </button>
@@ -1106,7 +1106,7 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
                     <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md animate-scale-in">
                         <div className="flex items-center gap-3 mb-5">
-                            <div className="w-12 h-12 bg-gradient-to-br from-rose-400 to-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-rose-500/30">
+                            <div className="w-12 h-12 bg-[#8a5a5a] rounded-xl flex items-center justify-center text-white shadow-sm">
                                 <XIcon />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900">Afvis registrering</h3>
@@ -1115,12 +1115,12 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                             value={rejectReason}
                             onChange={(e) => setRejectReason(e.target.value)}
                             placeholder="Angiv årsag til afvisning..."
-                            className="w-full border border-gray-200 rounded-xl p-4 h-32 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 resize-none"
+                            className="w-full border border-gray-200 rounded-xl p-4 h-32 focus:ring-2 focus:ring-[#8a5a5a] focus:border-[#8a5a5a] resize-none"
                         />
                         <div className="flex gap-3 mt-5">
                             <button
                                 onClick={handleReject}
-                                className="flex-1 px-5 py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white rounded-xl hover:from-rose-600 hover:to-rose-700 font-medium transition-all shadow-lg shadow-rose-500/25"
+                                className="flex-1 px-5 py-3 bg-[#8a5a5a] text-white rounded-xl hover:bg-[#7a4a4a] font-medium transition-all shadow-sm"
                             >
                                 Afvis registrering
                             </button>
@@ -1149,7 +1149,7 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 bg-gradient-to-br from-rose-400 to-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-rose-500/30">
+                            <div className="w-10 h-10 bg-[#8a5a5a] rounded-xl flex items-center justify-center text-white shadow-sm">
                                 <XIcon />
                             </div>
                             <div>
@@ -1161,7 +1161,7 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                 )}
                             </div>
                         </div>
-                        <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 mb-4">
+                        <div className="bg-[#8a5a5a]/10 border border-[#8a5a5a]/20 rounded-xl p-4 mb-4">
                             <p className="text-gray-800 whitespace-pre-wrap">{viewReasonModal.reason}</p>
                         </div>
                         {viewReasonModal.entry && (
@@ -1193,8 +1193,8 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                             </div>
                         </div>
 
-                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5">
-                            <div className="flex items-start gap-2 text-amber-700 text-sm">
+                        <div className="bg-[#8a7a55]/10 border border-[#8a7a55]/20 rounded-xl p-4 mb-5">
+                            <div className="flex items-start gap-2 text-[#8a7a55] text-sm">
                                 <WarningIcon />
                                 <div>
                                     <div className="font-semibold">Bemærk</div>

@@ -11,22 +11,17 @@ export default function GrantStatusBadge({ used, total, showBar = true }) {
     const percentage = calculateGrantPercentage(used, total);
     const color = getGrantStatusColor(percentage);
 
+    // Muted color scheme
     const colorClasses = {
-        green: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20',
-        yellow: 'bg-amber-500/10 text-amber-700 border-amber-500/20',
-        red: 'bg-rose-500/10 text-rose-700 border-rose-500/20'
+        green: 'bg-[#5a7a6a]/10 text-[#5a7a6a] border-[#5a7a6a]/20',
+        yellow: 'bg-[#8a7a55]/10 text-[#8a7a55] border-[#8a7a55]/20',
+        red: 'bg-[#8a5a5a]/10 text-[#8a5a5a] border-[#8a5a5a]/20'
     };
 
     const barColorClasses = {
-        green: 'from-emerald-400 to-emerald-600',
-        yellow: 'from-amber-400 to-amber-600',
-        red: 'from-rose-400 to-rose-600'
-    };
-
-    const glowClasses = {
-        green: 'shadow-emerald-500/20',
-        yellow: 'shadow-amber-500/20',
-        red: 'shadow-rose-500/20'
+        green: 'bg-[#5a7a6a]',
+        yellow: 'bg-[#8a7a55]',
+        red: 'bg-[#8a5a5a]'
     };
 
     return (
@@ -34,28 +29,26 @@ export default function GrantStatusBadge({ used, total, showBar = true }) {
             <div className={`
                 inline-flex items-center gap-2 px-3 py-1.5
                 rounded-full border text-xs font-medium
-                backdrop-blur-sm shadow-lg
-                transition-all duration-300
+                backdrop-blur-sm shadow-sm
+                transition-all duration-300 hover:shadow-md
                 ${colorClasses[color]}
-                ${glowClasses[color]}
             `}>
                 <span className="font-bold">{formatHours(used)}</span>
                 <span className="text-gray-400">/</span>
                 <span>{formatHours(total)} timer</span>
                 {percentage >= 100 && (
-                    <span className="ml-1 text-rose-600 animate-pulse">
+                    <span className="ml-1 text-[#8a5a5a] animate-pulse">
                         <WarningIcon />
                     </span>
                 )}
             </div>
 
             {showBar && (
-                <div className="w-full bg-white/30 backdrop-blur-sm rounded-full h-2 overflow-hidden shadow-inner border border-white/20">
+                <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden border border-gray-200">
                     <div
                         className={`
                             h-2 rounded-full transition-all duration-500 ease-out
-                            bg-gradient-to-r ${barColorClasses[color]}
-                            shadow-lg
+                            ${barColorClasses[color]}
                         `}
                         style={{ width: `${Math.min(100, percentage)}%` }}
                     />

@@ -209,7 +209,7 @@ export default function ChildrenPage({ readOnly = false }) {
                                             <div className="space-y-1">
                                                 <span className="text-sm text-gray-600">{translateGrantType(child.grant_type)}</span>
                                                 {child.has_frame_grant && (
-                                                    <span className="block inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-500/15 text-purple-700 border border-purple-500/20 backdrop-blur-sm">
+                                                    <span className="block inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#7a6a8a]/15 text-[#7a6a8a] border border-[#7a6a8a]/20 backdrop-blur-sm">
                                                         + Rammebevilling
                                                     </span>
                                                 )}
@@ -223,7 +223,7 @@ export default function ChildrenPage({ readOnly = false }) {
                                                         : `${child.grant_hours} timer/${translateGrantType(child.grant_type).toLowerCase()}`}
                                                 </div>
                                                 {child.has_frame_grant && (
-                                                    <div className="text-purple-600 font-medium">
+                                                    <div className="text-[#7a6a8a] font-medium">
                                                         {child.frame_hours} timer/år (ramme)
                                                     </div>
                                                 )}
@@ -244,7 +244,7 @@ export default function ChildrenPage({ readOnly = false }) {
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(child.id)}
-                                                        className="p-2 text-gray-500 hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-all duration-200"
+                                                        className="p-2 text-gray-500 hover:text-[#8a5a5a] hover:bg-[#8a5a5a]/10 rounded-lg transition-all duration-200"
                                                         title="Slet"
                                                     >
                                                         <TrashIcon />
@@ -455,17 +455,17 @@ export default function ChildrenPage({ readOnly = false }) {
                             </div>
 
                             {/* Rammebevilling - separat sektion */}
-                            <div className="p-4 bg-purple-500/10 rounded-xl border border-purple-500/20 backdrop-blur-sm">
+                            <div className="p-4 bg-[#7a6a8a]/10 rounded-xl border border-[#7a6a8a]/20 backdrop-blur-sm">
                                 <label className="flex items-center gap-3 cursor-pointer">
                                     <input
                                         type="checkbox"
                                         checked={formData.has_frame_grant}
                                         onChange={(e) => setFormData({ ...formData, has_frame_grant: e.target.checked })}
-                                        className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                                        className="rounded border-gray-300 text-[#7a6a8a] focus:ring-[#7a6a8a]"
                                     />
                                     <div>
-                                        <span className="font-semibold text-purple-700">Rammebevilling</span>
-                                        <p className="text-xs text-purple-600/70 mt-0.5">Årlig ramme ud over normal bevillingstype</p>
+                                        <span className="font-semibold text-[#7a6a8a]">Rammebevilling</span>
+                                        <p className="text-xs text-[#7a6a8a]/70 mt-0.5">Årlig ramme ud over normal bevillingstype</p>
                                     </div>
                                 </label>
                                 {formData.has_frame_grant && (
@@ -489,7 +489,7 @@ export default function ChildrenPage({ readOnly = false }) {
                                             placeholder="0"
                                             className="glass-input w-full rounded-xl px-4 py-2.5"
                                         />
-                                        <p className="text-xs text-purple-600/70 mt-2">Rammebevilling overruler den normale bevillingstype når aktiveret</p>
+                                        <p className="text-xs text-[#7a6a8a]/70 mt-2">Rammebevilling overruler den normale bevillingstype når aktiveret</p>
                                     </div>
                                 )}
                             </div>

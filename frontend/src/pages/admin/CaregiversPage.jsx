@@ -212,7 +212,7 @@ export default function CaregiversPage({ readOnly = false }) {
                                     >
                                         <td className="px-5 py-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-gradient-to-br from-violet-400 to-violet-600 rounded-xl flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-violet-500/20">
+                                                <div className="w-10 h-10 bg-[#6a5a8a] rounded-xl flex items-center justify-center text-white text-xs font-bold shadow-sm">
                                                     {caregiver.first_name?.charAt(0)}{caregiver.last_name?.charAt(0)}
                                                 </div>
                                                 <span className="font-semibold text-gray-900">{caregiver.first_name} {caregiver.last_name}</span>
@@ -251,7 +251,7 @@ export default function CaregiversPage({ readOnly = false }) {
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(caregiver.id)}
-                                                        className="p-2 text-gray-500 hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-all duration-200"
+                                                        className="p-2 text-gray-500 hover:text-[#8a5a5a] hover:bg-[#8a5a5a]/10 rounded-lg transition-all duration-200"
                                                         title="Slet"
                                                     >
                                                         <TrashIcon />
@@ -293,7 +293,7 @@ export default function CaregiversPage({ readOnly = false }) {
                     <div className="glass-card-strong rounded-2xl shadow-2xl p-6 w-full max-w-md animate-scale-in">
                         <div className="flex items-center justify-between mb-6">
                             <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 bg-gradient-to-br from-violet-400 to-violet-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-violet-500/30">
+                                <div className="w-12 h-12 bg-[#6a5a8a] rounded-xl flex items-center justify-center text-white shadow-sm">
                                     <UsersIcon />
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-900">
