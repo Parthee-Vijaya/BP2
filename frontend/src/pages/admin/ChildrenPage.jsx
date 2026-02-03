@@ -181,7 +181,6 @@ export default function ChildrenPage({ readOnly = false }) {
                                 <tr className="bg-white/40 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     <th className="px-5 py-4">Navn</th>
                                     <th className="px-5 py-4">Fødselsdato</th>
-                                    <th className="px-5 py-4">Bevillingstype</th>
                                     <th className="px-5 py-4">Bevilling</th>
                                     <th className="px-5 py-4">Barnepiger</th>
                                     {!readOnly && <th className="px-5 py-4">Handlinger</th>}
@@ -206,26 +205,16 @@ export default function ChildrenPage({ readOnly = false }) {
                                             {child.birth_date ? formatDate(child.birth_date) : '-'}
                                         </td>
                                         <td className="px-5 py-4">
-                                            <div className="space-y-1">
-                                                <span className="text-sm text-gray-600">{translateGrantType(child.grant_type)}</span>
-                                                {child.has_frame_grant && (
-                                                    <span className="block inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#7a6a8a]/15 text-[#7a6a8a] border border-[#7a6a8a]/20 backdrop-blur-sm">
-                                                        + Rammebevilling
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </td>
-                                        <td className="px-5 py-4 text-sm text-gray-600">
-                                            <div className="space-y-1">
-                                                <div>
+                                            <div className="flex items-center gap-3">
+                                                <span className="font-semibold text-gray-900">
                                                     {child.grant_type === 'specific_weekdays'
-                                                        ? 'Pr. ugedag'
+                                                        ? 'Specifikke ugedage'
                                                         : `${child.grant_hours} timer/${translateGrantType(child.grant_type).toLowerCase()}`}
-                                                </div>
-                                                {child.has_frame_grant && (
-                                                    <div className="text-[#7a6a8a] font-medium">
-                                                        {child.frame_hours} timer/år (ramme)
-                                                    </div>
+                                                </span>
+                                                {!!child.has_frame_grant && (
+                                                    <span className="text-sm text-[#7a6a8a]">
+                                                        + {child.frame_hours} timer/år (ramme)
+                                                    </span>
                                                 )}
                                             </div>
                                         </td>
