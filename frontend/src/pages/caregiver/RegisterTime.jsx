@@ -48,6 +48,31 @@ export default function RegisterTime({ caregiverId = 1 }) {
 
     const [preview, setPreview] = useState(null);
     const [selectedChild, setSelectedChild] = useState(null);
+    const [timeError, setTimeError] = useState('');
+
+    // Valider tidsinterval
+    function validateTimeInterval(startTime, endTime) {
+        if (!startTime || !endTime) return { valid: true, error: '' };
+
+        // Sammenlign tider direkte som strings (HH:MM format)
+        if (endTime <= startTime) {
+            return { valid: false, error: 'Sluttid skal være efter starttid' };
+        }
+
+        // Beregn timer
+        const [startH, startM] = startTime.split(':').map(Number);
+        const [endH, endM] = endTime.split(':').map(Number);
+        const startMinutes = startH * 60 + startM;
+        const endMinutes = endH * 60 + endM;
+        const totalMinutes = endMinutes - startMinutes;
+        const totalHours = totalMinutes / 60;
+
+        if (totalHours > 24) {
+            return { valid: false, error: 'Maksimalt 24 timer pr. registrering' };
+        }
+
+        return { valid: true, error: '' };
+    }
 
     useEffect(() => {
         loadCaregiver();
@@ -98,6 +123,13 @@ export default function RegisterTime({ caregiverId = 1 }) {
         const today = new Date().toISOString().split('T')[0];
         if (formData.date > today) {
             alert('Du kan ikke registrere timer for fremtidige datoer');
+            return;
+        }
+
+        // Valider tidsinterval
+        const timeValidation = validateTimeInterval(formData.start_time, formData.end_time);
+        if (!timeValidation.valid) {
+            setTimeError(timeValidation.error);
             return;
         }
 
@@ -272,8 +304,13 @@ export default function RegisterTime({ caregiverId = 1 }) {
                             <input
                                 type="time"
                                 value={formData.start_time}
-                                onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
-                                className="glass-input w-full rounded-xl px-4 py-3"
+                                onChange={(e) => {
+                                    const newStart = e.target.value;
+                                    setFormData({ ...formData, start_time: newStart });
+                                    const validation = validateTimeInterval(newStart, formData.end_time);
+                                    setTimeError(validation.error);
+                                }}
+                                className={`glass-input w-full rounded-xl px-4 py-3 ${timeError ? 'border-[#8a5a5a] ring-2 ring-[#8a5a5a]/20' : ''}`}
                                 required
                             />
                         </div>
@@ -282,12 +319,25 @@ export default function RegisterTime({ caregiverId = 1 }) {
                             <input
                                 type="time"
                                 value={formData.end_time}
-                                onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
-                                className="glass-input w-full rounded-xl px-4 py-3"
+                                onChange={(e) => {
+                                    const newEnd = e.target.value;
+                                    setFormData({ ...formData, end_time: newEnd });
+                                    const validation = validateTimeInterval(formData.start_time, newEnd);
+                                    setTimeError(validation.error);
+                                }}
+                                className={`glass-input w-full rounded-xl px-4 py-3 ${timeError ? 'border-[#8a5a5a] ring-2 ring-[#8a5a5a]/20' : ''}`}
                                 required
                             />
                         </div>
                     </div>
+                    {timeError && (
+                        <div className="mt-2 p-3 bg-[#8a5a5a]/10 border border-[#8a5a5a]/30 rounded-xl text-[#8a5a5a] text-sm font-medium flex items-center gap-2">
+                            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                            {timeError}
+                        </div>
+                    )}
 
                     {/* Kommentar */}
                     <div>

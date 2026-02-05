@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { caregiversApi, childrenApi } from '../../utils/api';
 import { padMaNumber } from '../../utils/helpers';
+import ConfirmDialog from '../../components/ConfirmDialog';
 
 // Icons
 const PlusIcon = () => (
@@ -61,6 +62,7 @@ export default function CaregiversPage({ readOnly = false }) {
     const [formData, setFormData] = useState({});
     const [searchQuery, setSearchQuery] = useState('');
     const [maError, setMaError] = useState('');
+    const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, caregiver: null, isLoading: false });
 
     useEffect(() => {
         loadData();
@@ -130,14 +132,27 @@ export default function CaregiversPage({ readOnly = false }) {
         }
     }
 
-    async function handleDelete(id) {
-        if (!confirm('Er du sikker på at du vil slette denne barnepige?')) return;
+    function handleDelete(caregiver) {
+        setDeleteConfirm({ isOpen: true, caregiver, isLoading: false });
+    }
 
+    async function confirmDelete() {
+        if (!deleteConfirm.caregiver) return;
+
+        setDeleteConfirm(prev => ({ ...prev, isLoading: true }));
         try {
-            await caregiversApi.delete(id);
+            await caregiversApi.delete(deleteConfirm.caregiver.id);
+            setDeleteConfirm({ isOpen: false, caregiver: null, isLoading: false });
             loadData();
         } catch (error) {
+            setDeleteConfirm(prev => ({ ...prev, isLoading: false }));
             alert('Fejl ved sletning: ' + error.message);
+        }
+    }
+
+    function cancelDelete() {
+        if (!deleteConfirm.isLoading) {
+            setDeleteConfirm({ isOpen: false, caregiver: null, isLoading: false });
         }
     }
 
@@ -250,7 +265,7 @@ export default function CaregiversPage({ readOnly = false }) {
                                                         <EditIcon />
                                                     </button>
                                                     <button
-                                                        onClick={() => handleDelete(caregiver.id)}
+                                                        onClick={() => handleDelete(caregiver)}
                                                         className="p-2 text-gray-500 hover:text-[#8a5a5a] hover:bg-[#8a5a5a]/10 rounded-lg transition-all duration-200"
                                                         title="Slet"
                                                     >
@@ -286,6 +301,22 @@ export default function CaregiversPage({ readOnly = false }) {
                     )}
                 </div>
             )}
+
+            {/* Delete Confirmation Dialog */}
+            <ConfirmDialog
+                isOpen={deleteConfirm.isOpen}
+                variant="danger"
+                title="Slet barnepige"
+                message={deleteConfirm.caregiver
+                    ? `Er du sikker på at du vil slette ${deleteConfirm.caregiver.first_name} ${deleteConfirm.caregiver.last_name}? Denne handling kan ikke fortrydes.`
+                    : ''
+                }
+                confirmText="Slet barnepige"
+                cancelText="Annuller"
+                onConfirm={confirmDelete}
+                onCancel={cancelDelete}
+                isLoading={deleteConfirm.isLoading}
+            />
 
             {/* Edit/Create Modal */}
             {editModal.open && (

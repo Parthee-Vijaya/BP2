@@ -44,6 +44,7 @@ export const timeEntriesApi = {
     getById: (id) => fetchApi(`/time-entries/${id}`),
     create: (data) => fetchApi('/time-entries', { method: 'POST', body: JSON.stringify(data) }),
     preview: (data) => fetchApi('/time-entries/preview', { method: 'POST', body: JSON.stringify(data) }),
+    delete: (id) => fetchApi(`/time-entries/${id}`, { method: 'DELETE' }),
     approve: (id, reviewedBy) => fetchApi(`/time-entries/${id}/approve`, {
         method: 'PUT',
         body: JSON.stringify({ reviewed_by: reviewedBy })

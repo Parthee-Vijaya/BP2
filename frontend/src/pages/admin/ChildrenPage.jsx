@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { childrenApi, caregiversApi } from '../../utils/api';
 import GrantStatusBadge from '../../components/GrantStatusBadge';
+import ConfirmDialog from '../../components/ConfirmDialog';
 import { translateGrantType, translateWeekday, formatDate, padMaNumber } from '../../utils/helpers';
 
 // Icons
@@ -47,6 +48,7 @@ export default function ChildrenPage({ readOnly = false }) {
     const [editModal, setEditModal] = useState({ open: false, child: null });
     const [formData, setFormData] = useState({});
     const [searchQuery, setSearchQuery] = useState('');
+    const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, child: null, isLoading: false });
 
     useEffect(() => {
         loadData();
@@ -111,14 +113,27 @@ export default function ChildrenPage({ readOnly = false }) {
         }
     }
 
-    async function handleDelete(id) {
-        if (!confirm('Er du sikker på at du vil slette dette barn?')) return;
+    function handleDelete(child) {
+        setDeleteConfirm({ isOpen: true, child, isLoading: false });
+    }
 
+    async function confirmDelete() {
+        if (!deleteConfirm.child) return;
+
+        setDeleteConfirm(prev => ({ ...prev, isLoading: true }));
         try {
-            await childrenApi.delete(id);
+            await childrenApi.delete(deleteConfirm.child.id);
+            setDeleteConfirm({ isOpen: false, child: null, isLoading: false });
             loadData();
         } catch (error) {
+            setDeleteConfirm(prev => ({ ...prev, isLoading: false }));
             alert('Fejl ved sletning: ' + error.message);
+        }
+    }
+
+    function cancelDelete() {
+        if (!deleteConfirm.isLoading) {
+            setDeleteConfirm({ isOpen: false, child: null, isLoading: false });
         }
     }
 
@@ -232,7 +247,7 @@ export default function ChildrenPage({ readOnly = false }) {
                                                         <EditIcon />
                                                     </button>
                                                     <button
-                                                        onClick={() => handleDelete(child.id)}
+                                                        onClick={() => handleDelete(child)}
                                                         className="p-2 text-gray-500 hover:text-[#8a5a5a] hover:bg-[#8a5a5a]/10 rounded-lg transition-all duration-200"
                                                         title="Slet"
                                                     >
@@ -268,6 +283,22 @@ export default function ChildrenPage({ readOnly = false }) {
                     )}
                 </div>
             )}
+
+            {/* Delete Confirmation Dialog */}
+            <ConfirmDialog
+                isOpen={deleteConfirm.isOpen}
+                variant="danger"
+                title="Slet barn"
+                message={deleteConfirm.child
+                    ? `Er du sikker på at du vil slette ${deleteConfirm.child.first_name} ${deleteConfirm.child.last_name}? Alle tilknyttede registreringer vil også blive slettet. Denne handling kan ikke fortrydes.`
+                    : ''
+                }
+                confirmText="Slet barn"
+                cancelText="Annuller"
+                onConfirm={confirmDelete}
+                onCancel={cancelDelete}
+                isLoading={deleteConfirm.isLoading}
+            />
 
             {/* Edit/Create Modal */}
             {editModal.open && (

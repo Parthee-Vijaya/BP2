@@ -315,4 +315,29 @@ router.post('/batch-approve', (req, res) => {
     }
 });
 
+// DELETE /api/time-entries/:id - Slet afventende registrering
+router.delete('/:id', (req, res) => {
+    try {
+        const entry = db.prepare('SELECT * FROM time_entries WHERE id = ?').get(req.params.id);
+
+        if (!entry) {
+            return res.status(404).json({ error: 'Registrering ikke fundet' });
+        }
+
+        // Kun afventende registreringer kan slettes
+        if (entry.status !== 'pending') {
+            return res.status(400).json({
+                error: 'Kun afventende registreringer kan slettes'
+            });
+        }
+
+        db.prepare('DELETE FROM time_entries WHERE id = ?').run(req.params.id);
+
+        res.json({ message: 'Registrering slettet', id: req.params.id });
+    } catch (error) {
+        console.error('Fejl ved sletning af registrering:', error);
+        res.status(500).json({ error: 'Kunne ikke slette registrering' });
+    }
+});
+
 export default router;

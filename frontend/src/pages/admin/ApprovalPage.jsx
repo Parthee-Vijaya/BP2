@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { timeEntriesApi, childrenApi, caregiversApi, exportApi, settingsApi } from '../../utils/api';
 import { formatHours, padMaNumber } from '../../utils/helpers';
+import ConfirmDialog from '../../components/ConfirmDialog';
 
 // Icons
 const ClockIcon = () => (
@@ -105,12 +106,13 @@ function getDayName(dateString) {
 // Sorterbar kolonneheader
 function SortableHeader({ label, sortKey, currentSort, onSort, className = '' }) {
     const isActive = currentSort.key === sortKey;
+    const isRightAligned = className.includes('text-right');
     return (
         <th
             className={`px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none transition-colors ${className}`}
             onClick={() => onSort(sortKey)}
         >
-            <div className="flex items-center gap-1">
+            <div className={`flex items-center gap-1 ${isRightAligned ? 'justify-end' : ''}`}>
                 {label}
                 {isActive && <SortIcon direction={currentSort.direction} />}
             </div>
@@ -134,6 +136,7 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
     const [rejectReason, setRejectReason] = useState('');
     const [viewReasonModal, setViewReasonModal] = useState({ open: false, reason: '', entry: null });
     const [isCompactView, setIsCompactView] = useState(true);
+    const [batchApproveConfirm, setBatchApproveConfirm] = useState({ isOpen: false, isLoading: false });
 
     // Sorterings-state: key + direction (default: dato, nyeste først)
     const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'desc' });
@@ -150,9 +153,15 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
     // Automatisk kompakt visning på mobil
     const effectiveCompactView = isMobileView || isCompactView;
 
-    // Sæt default sortering baseret på aktiv tab (dato, nyeste først)
+    // Sæt default sortering baseret på aktiv tab
     useEffect(() => {
-        setSortConfig({ key: 'date', direction: 'desc' });
+        if (activeTab === 'rejected') {
+            // Afviste: sortér efter barnepige-navn (A-Å)
+            setSortConfig({ key: 'caregiver_name', direction: 'asc' });
+        } else {
+            // Afventer og Godkendte: sortér efter dato (nyeste først)
+            setSortConfig({ key: 'date', direction: 'desc' });
+        }
     }, [activeTab]);
 
     useEffect(() => {
@@ -194,11 +203,11 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
             if (selectedCaregiver !== 'all') {
                 params.caregiver_id = selectedCaregiver;
             }
-            // Periode-søgning for godkendte
-            if (activeTab === 'approved' && approvedFromDate) {
+            // Periode-søgning for alle tabs
+            if (approvedFromDate) {
                 params.from_date = approvedFromDate;
             }
-            if (activeTab === 'approved' && approvedToDate) {
+            if (approvedToDate) {
                 params.to_date = approvedToDate;
             }
 
@@ -260,6 +269,8 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                 return entry.start_time;
             case 'total_hours':
                 return entry.total_hours;
+            case 'normal_hours':
+                return entry.normal_hours;
             case 'ma_number':
                 return entry.ma_number || '';
             default:
@@ -309,18 +320,30 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
         }
     }
 
-    async function handleBatchApprove() {
+    function openBatchApproveConfirm() {
         if (selectedIds.length === 0) {
             alert('Vælg mindst én registrering');
             return;
         }
+        setBatchApproveConfirm({ isOpen: true, isLoading: false });
+    }
 
+    async function handleBatchApprove() {
+        setBatchApproveConfirm(prev => ({ ...prev, isLoading: true }));
         try {
             await timeEntriesApi.batchApprove(selectedIds, 'Admin');
             setSelectedIds([]);
+            setBatchApproveConfirm({ isOpen: false, isLoading: false });
             loadData();
         } catch (error) {
+            setBatchApproveConfirm(prev => ({ ...prev, isLoading: false }));
             alert('Fejl ved batch-godkendelse: ' + error.message);
+        }
+    }
+
+    function cancelBatchApprove() {
+        if (!batchApproveConfirm.isLoading) {
+            setBatchApproveConfirm({ isOpen: false, isLoading: false });
         }
     }
 
@@ -393,8 +416,8 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
     }
 
     function formatTimeBreakdown(entry) {
+        // Kun tillæg - Normal vises separat i hovedoversigten
         const parts = [];
-        if (entry.normal_hours > 0) parts.push({ label: 'Normal', value: entry.normal_hours, color: 'bg-muted-blue text-muted-blue border border-muted-blue' });
         if (entry.evening_hours > 0) parts.push({ label: 'Aften', value: entry.evening_hours, color: 'bg-muted-purple text-muted-purple border border-muted-purple' });
         if (entry.night_hours > 0) parts.push({ label: 'Nat', value: entry.night_hours, color: 'bg-muted-indigo text-muted-indigo border border-muted-indigo' });
         if (entry.saturday_hours > 0) parts.push({ label: 'Lørdag', value: entry.saturday_hours, color: 'bg-muted-amber text-muted-amber border border-muted-amber' });
@@ -541,18 +564,18 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                 </span>
                                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#B54A32]/10 rounded-lg border border-[#B54A32]/20">
                                     <span className="text-sm font-bold text-[#B54A32]">{formatHours(summary.totalHours)}</span>
-                                    <span className="text-xs text-[#B54A32]/70">timer</span>
+                                    <span className="text-xs text-[#B54A32]/70">timer total</span>
+                                </span>
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-muted-blue/10 rounded-lg border border-muted-blue/20">
+                                    <span className="text-sm font-bold text-muted-blue">{formatHours(summary.normalHours)}</span>
+                                    <span className="text-xs text-muted-blue/70">normal</span>
                                 </span>
                             </div>
                             {/* Separator */}
                             <div className="hidden sm:block h-4 w-px bg-gray-300"></div>
-                            {/* Tillægsfordeling med navne - muted farver */}
+                            {/* Kun tillæg - Normal vises i hovedtal */}
                             <div className="flex items-center gap-4 text-xs">
-                                <span className="text-gray-400">Fordeling:</span>
-                                <span className="inline-flex items-center gap-1.5">
-                                    <span className="text-gray-500">Normal:</span>
-                                    <span className="font-semibold text-muted-blue">{formatHours(summary.normalHours)}</span>
-                                </span>
+                                <span className="text-gray-400">Tillæg:</span>
                                 <span className="inline-flex items-center gap-1.5">
                                     <span className="text-gray-500">Aften:</span>
                                     <span className="font-semibold text-muted-purple">{formatHours(summary.eveningHours)}</span>
@@ -616,58 +639,32 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                             ))}
                         </select>
 
-                        {/* Sortering */}
+                        {/* Periode-søgning - for alle tabs */}
                         <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500 font-medium">Sortér:</span>
-                            <select
-                                value={`${sortConfig.key}-${sortConfig.direction}`}
-                                onChange={(e) => {
-                                    const [key, direction] = e.target.value.split('-');
-                                    setSortConfig({ key, direction });
-                                }}
-                                className="px-3 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[#B54A32]/20"
-                            >
-                                <option value="date-desc">Dato (nyeste først)</option>
-                                <option value="date-asc">Dato (ældste først)</option>
-                                <option value="caregiver_name-asc">Barnepige (A-Å)</option>
-                                <option value="caregiver_name-desc">Barnepige (Å-A)</option>
-                                <option value="child_name-asc">Barn (A-Å)</option>
-                                <option value="child_name-desc">Barn (Å-A)</option>
-                                <option value="total_hours-desc">Timer (flest først)</option>
-                                <option value="total_hours-asc">Timer (færrest først)</option>
-                            </select>
+                            <label className="text-xs text-gray-500 font-medium">Fra:</label>
+                            <input
+                                type="date"
+                                value={approvedFromDate}
+                                onChange={(e) => setApprovedFromDate(e.target.value)}
+                                className="px-3 py-2 bg-white border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[#B54A32]/20"
+                            />
                         </div>
-
-                        {/* Periode-søgning for godkendte - kun for admin */}
-                        {activeTab === 'approved' && userRole === 'admin' && (
-                            <>
-                                <div className="flex items-center gap-2">
-                                    <label className="text-xs text-gray-500 font-medium">Fra:</label>
-                                    <input
-                                        type="date"
-                                        value={approvedFromDate}
-                                        onChange={(e) => setApprovedFromDate(e.target.value)}
-                                        className="px-3 py-2 bg-white border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[#B54A32]/20"
-                                    />
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <label className="text-xs text-gray-500 font-medium">Til:</label>
-                                    <input
-                                        type="date"
-                                        value={approvedToDate}
-                                        onChange={(e) => setApprovedToDate(e.target.value)}
-                                        className="px-3 py-2 bg-white border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[#B54A32]/20"
-                                    />
-                                </div>
-                                {(approvedFromDate || approvedToDate) && (
-                                    <button
-                                        onClick={() => { setApprovedFromDate(''); setApprovedToDate(''); }}
-                                        className="text-xs text-gray-500 hover:text-[#B54A32] font-medium underline"
-                                    >
-                                        Nulstil
-                                    </button>
-                                )}
-                            </>
+                        <div className="flex items-center gap-2">
+                            <label className="text-xs text-gray-500 font-medium">Til:</label>
+                            <input
+                                type="date"
+                                value={approvedToDate}
+                                onChange={(e) => setApprovedToDate(e.target.value)}
+                                className="px-3 py-2 bg-white border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[#B54A32]/20"
+                            />
+                        </div>
+                        {(approvedFromDate || approvedToDate) && (
+                            <button
+                                onClick={() => { setApprovedFromDate(''); setApprovedToDate(''); }}
+                                className="text-xs text-gray-500 hover:text-[#B54A32] font-medium underline"
+                            >
+                                Nulstil
+                            </button>
                         )}
 
                         {activeTab === 'pending' && filteredEntries.length > 0 && (
@@ -682,9 +679,9 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                     Vælg alle
                                 </label>
                                 <button
-                                    onClick={handleBatchApprove}
+                                    onClick={openBatchApproveConfirm}
                                     disabled={selectedIds.length === 0}
-                                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#5a7a6a] text-white rounded-xl hover:bg-[#4a6a5a] disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm"
+                                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#2e7d32] text-white rounded-xl hover:bg-[#1b5e20] disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm"
                                 >
                                     <CheckMarkIcon />
                                     Godkend valgte ({selectedIds.length})
@@ -732,7 +729,7 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                     <SortableHeader label="Barn" sortKey="child_name" currentSort={sortConfig} onSort={handleSort} className="text-left" />
                                     <SortableHeader label="Dato" sortKey="date" currentSort={sortConfig} onSort={handleSort} className="text-left" />
                                     <SortableHeader label="Tid" sortKey="time" currentSort={sortConfig} onSort={handleSort} className="text-left" />
-                                    <SortableHeader label="Timer" sortKey="total_hours" currentSort={sortConfig} onSort={handleSort} className="text-right" />
+                                    <SortableHeader label="Normaltimer" sortKey="normal_hours" currentSort={sortConfig} onSort={handleSort} className="text-right" />
                                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tillæg</th>
                                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Bevilling</th>
                                     <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Handlinger</th>
@@ -784,7 +781,7 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                                 {entry.start_time?.slice(0,5)} - {entry.end_time?.slice(0,5)}
                                             </td>
                                             <td className="px-4 py-3 text-right">
-                                                <span className="font-bold text-gray-900">{formatHours(entry.total_hours)}</span>
+                                                <span className="font-bold text-gray-900">{formatHours(entry.normal_hours)}</span>
                                             </td>
                                             <td className="px-4 py-3">
                                                 {/* Tillæg badges i kompakt visning */}
@@ -806,7 +803,7 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                                         }`}>
                                                             {formatHours(grantStatus.usedHours)}/{formatHours(grantStatus.grantHours)}
                                                             {isExceeded && (
-                                                                <span className="ml-1" title="Det indtastede antal timer overskrider bevillingen. Det er godkender/leders opgave at sikre at det kan godkendes.">⚠️</span>
+                                                                <span className="ml-1">⚠️</span>
                                                             )}
                                                         </div>
                                                         <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
@@ -817,6 +814,11 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                                                 style={{ width: `${Math.min(grantStatus.percentage, 100)}%` }}
                                                             />
                                                         </div>
+                                                        {isExceeded && activeTab === 'pending' && (
+                                                            <div className="mt-1.5 text-[10px] text-[#8a5a5a] leading-tight">
+                                                                Overskrider bevilling - godkender/leder skal sikre godkendelse
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 )}
                                             </td>
@@ -825,13 +827,13 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                                     <div className="flex justify-end gap-2">
                                                         <button
                                                             onClick={() => handleApprove(entry.id)}
-                                                            className="px-3 py-1.5 bg-[#5a7a6a] text-white text-xs rounded-lg font-medium hover:bg-[#4a6a5a] transition-colors"
+                                                            className="px-3 py-1.5 bg-[#2e7d32] text-white text-xs rounded-lg font-medium hover:bg-[#1b5e20] transition-colors"
                                                         >
                                                             Godkend
                                                         </button>
                                                         <button
                                                             onClick={() => setRejectModal({ open: true, entryId: entry.id })}
-                                                            className="px-3 py-1.5 bg-[#8a5a5a] text-white text-xs rounded-lg font-medium hover:bg-[#7a4a4a] transition-colors"
+                                                            className="px-3 py-1.5 bg-[#c62828] text-white text-xs rounded-lg font-medium hover:bg-[#b71c1c] transition-colors"
                                                         >
                                                             Afvis
                                                         </button>
@@ -871,28 +873,6 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                 ) : (
                     /* DETAILED CARD VIEW */
                     <div className="p-4">
-                        {/* Sortering - samme som tabelvisning */}
-                        <div className="flex items-center gap-2 mb-4">
-                            <span className="text-xs text-gray-500 font-medium">Sortér:</span>
-                            <select
-                                value={`${sortConfig.key}-${sortConfig.direction}`}
-                                onChange={(e) => {
-                                    const [key, direction] = e.target.value.split('-');
-                                    setSortConfig({ key, direction });
-                                }}
-                                className="px-3 py-2 bg-white border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[#B54A32]/20"
-                            >
-                                <option value="date-desc">Dato (nyeste først)</option>
-                                <option value="date-asc">Dato (ældste først)</option>
-                                <option value="caregiver_name-asc">Barnepige (A-Å)</option>
-                                <option value="caregiver_name-desc">Barnepige (Å-A)</option>
-                                <option value="child_name-asc">Barn (A-Å)</option>
-                                <option value="child_name-desc">Barn (Å-A)</option>
-                                <option value="total_hours-desc">Timer (flest først)</option>
-                                <option value="total_hours-asc">Timer (færrest først)</option>
-                            </select>
-                        </div>
-
                         <div className="grid gap-3">
                             {filteredEntries.map((entry) => {
                                 const grantStatus = getGrantStatus(entry.child_id);
@@ -1034,14 +1014,14 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                                                             <div className="flex gap-2 flex-shrink-0">
                                                                 <button
                                                                     onClick={() => handleApprove(entry.id)}
-                                                                    className="px-5 py-2.5 bg-[#5a7a6a] text-white rounded-xl font-medium hover:bg-[#4a6a5a] transition-all shadow-sm flex items-center gap-2"
+                                                                    className="px-5 py-2.5 bg-[#2e7d32] text-white rounded-xl font-medium hover:bg-[#1b5e20] transition-all shadow-sm flex items-center gap-2"
                                                                 >
                                                                     <CheckMarkIcon />
                                                                     Godkend
                                                                 </button>
                                                                 <button
                                                                     onClick={() => setRejectModal({ open: true, entryId: entry.id })}
-                                                                    className="px-5 py-2.5 bg-[#8a5a5a] text-white rounded-xl font-medium hover:bg-[#7a4a4a] transition-all shadow-sm flex items-center gap-2"
+                                                                    className="px-5 py-2.5 bg-[#c62828] text-white rounded-xl font-medium hover:bg-[#b71c1c] transition-all shadow-sm flex items-center gap-2"
                                                                 >
                                                                     <XIcon />
                                                                     Afvis
@@ -1100,6 +1080,19 @@ export default function ApprovalPage({ isMobileView = false, userRole = 'admin' 
                     </div>
                 )}
             </div>
+
+            {/* Batch Approve Confirmation Dialog */}
+            <ConfirmDialog
+                isOpen={batchApproveConfirm.isOpen}
+                variant="info"
+                title="Bekræft batch-godkendelse"
+                message={`Er du sikker på at du vil godkende ${selectedIds.length} registrering${selectedIds.length > 1 ? 'er' : ''}? Denne handling kan ikke fortrydes.`}
+                confirmText={`Godkend ${selectedIds.length} registrering${selectedIds.length > 1 ? 'er' : ''}`}
+                cancelText="Annuller"
+                onConfirm={handleBatchApprove}
+                onCancel={cancelBatchApprove}
+                isLoading={batchApproveConfirm.isLoading}
+            />
 
             {/* Reject Modal */}
             {rejectModal.open && (
