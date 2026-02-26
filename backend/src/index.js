@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { initializeDatabase } from './db/database.js';
 import childrenRouter from './routes/children.js';
@@ -45,7 +46,6 @@ app.get('/api/health', (req, res) => {
 });
 
 // Serve frontend static files in production
-import fs from 'fs';
 const frontendDist = path.resolve(__dirname, '..', '..', 'frontend', 'dist');
 console.log('Frontend dist path:', frontendDist);
 console.log('Frontend dist exists:', fs.existsSync(frontendDist));
