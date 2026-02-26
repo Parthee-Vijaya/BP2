@@ -45,27 +45,29 @@ app.get('/api/health', (req, res) => {
 });
 
 // Serve frontend static files in production
-const frontendDist = path.join(__dirname, '../../frontend/dist');
+import fs from 'fs';
+const frontendDist = path.resolve(__dirname, '..', '..', 'frontend', 'dist');
+console.log('Frontend dist path:', frontendDist);
+console.log('Frontend dist exists:', fs.existsSync(frontendDist));
+if (fs.existsSync(frontendDist)) {
+    console.log('Frontend dist contents:', fs.readdirSync(frontendDist));
+}
+
 app.use(express.static(frontendDist));
 
 // Catch-all: serve React app for any non-API route
 app.get('*', (req, res) => {
     const indexPath = path.join(frontendDist, 'index.html');
-    res.sendFile(indexPath, (err) => {
-        if (err) {
-            res.json({
-                message: 'Barnepige Timeregistrering API',
-                version: '1.0.0',
-                endpoints: {
-                    children: '/api/children',
-                    caregivers: '/api/caregivers',
-                    timeEntries: '/api/time-entries',
-                    export: '/api/export',
-                    health: '/api/health'
-                }
-            });
-        }
-    });
+    if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+    } else {
+        res.json({
+            message: 'Barnepige Timeregistrering API',
+            version: '1.0.0',
+            note: 'Frontend not built. Run: cd frontend && npm run build',
+            debug: { frontendDist, indexExists: false }
+        });
+    }
 });
 
 // Error handling
